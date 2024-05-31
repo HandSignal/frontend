@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, SetStateAction } from "react";
 import Webcam from "react-webcam";
 import { css } from "@emotion/css";
 import { Camera } from "@mediapipe/camera_utils";
@@ -41,7 +41,8 @@ const App = () => {
     };
   }, [holistic]);
 
-  // Mediapipe Holistic 결과 처리 및 녹화 데이터 저장
+  
+// Mediapipe Holistic 결과 처리 및 녹화 데이터 저장
   const onResults = useCallback((results: Results) => {
     const canvasCtx = canvasRef.current!.getContext("2d")!;
     
@@ -55,18 +56,19 @@ const App = () => {
 
     // 녹화 중이라면 데이터 저장
     if (isRecording) {
-      setRecordedData(prevData => [
-        ...prevData,
-        {
-          pose_keypoint: poseKeypoints || [],
-          left_hand_keypoint: leftHandKeypoints || [],
-          right_hand_keypoint: rightHandKeypoints || [],
-        },
-      ]);
+      setRecordedData((prevData: any[]) => {
+        // 이전 상태를 가져와서 새로운 상태를 명시적으로 구성
+        return [
+          ...prevData,
+          {
+            pose_keypoints: poseKeypoints || [],
+            left_hand_keypoints: leftHandKeypoints || [],
+            right_hand_keypoints: rightHandKeypoints || [],
+          }
+        ];
+      });
     }
   }, [isRecording]);
-
-
 
   // 웹캠과 Mediapipe Holistic 모델 연결
   useEffect(() => {
@@ -83,6 +85,7 @@ const App = () => {
     }
   }, [holistic, onResults]);
 
+
   // 녹화 시작/중지 토글 함수
   const toggleRecording = () => {
     setIsRecording((prev) => !prev);
@@ -91,9 +94,33 @@ const App = () => {
     }
   };
 
-  // 녹화된 데이터를 JSON 파일로 저장하는 함수
   const saveDataToJson = () => {
-    const jsonData = JSON.stringify(recordedData, null, 2); // 두 번째 매개변수에 null을 전달하고 세 번째 매개변수에 들여쓰기 수준을 지정합니다.
+    // pose_keypoints, left_hand_keypoints, right_hand_keypoints를 모아서 출력할 배열 초기화
+    let poseKeypointsArray: any[] = [];
+    let leftHandKeypointsArray: any[] = [];
+    let rightHandKeypointsArray: any[] = [];
+  
+    // recordedData 배열을 순회하면서 각 레코드에서 키포인트를 추출하여 해당 배열에 추가
+    recordedData.forEach(result => {
+      if (result.pose_keypoints) {
+        poseKeypointsArray = poseKeypointsArray.concat(result.pose_keypoints);
+      }
+      if (result.left_hand_keypoints) {
+        leftHandKeypointsArray = leftHandKeypointsArray.concat(result.left_hand_keypoints);
+      }
+      if (result.right_hand_keypoints) {
+        rightHandKeypointsArray = rightHandKeypointsArray.concat(result.right_hand_keypoints);
+      }
+    });
+  
+    // 각 키포인트 배열을 하나의 객체로 합쳐서 JSON으로 변환
+    const formattedData = {
+      pose_keypoints: poseKeypointsArray,
+      left_hand_keypoints: leftHandKeypointsArray,
+      right_hand_keypoints: rightHandKeypointsArray
+    };
+  
+    const jsonData = JSON.stringify(formattedData, null, 2); // JSON 형식으로 변환하고 들여쓰기 적용
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -104,6 +131,8 @@ const App = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  
+  
 
   return (
     <div className={styles.container}>
