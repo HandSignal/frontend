@@ -30,10 +30,10 @@ const App = () => {
     });
 
     hands.setOptions({
-      maxNumHands: 2, // 손을 몇 개 까지 인식할지
-      modelComplexity: 1, // 모델 복잡도 → 모델이 얼마나 다양하고 상세한 패턴을 학습하는지 
-      minDetectionConfidence: 0.5, // 최소 신뢰도 → 모델이 인식한 결과 중 신뢰도가 0.5 이상인 결과만 출력
-      minTrackingConfidence: 0.5, // 최대 신뢰도
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
     });
 
     hands.onResults(onResults);
