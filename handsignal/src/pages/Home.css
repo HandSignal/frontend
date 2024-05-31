@@ -1,0 +1,39 @@
+/* src/pages/Home.css */
+.home-container {
+    background-image: url('../assets/main2.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+  }
+  
+  .home-container h1 {
+    margin-bottom: 16px;
+  }
+  
+  .home-container p {
+    margin-bottom: 24px;
+  }
+  
+  .home-container button {
+    color: #000000; /* 기본 글씨 색상 */
+    background-color: #E4B9FF; /* 기본 배경 색상 */
+    border: none;
+    font-size: 1.5rem;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-top: 300px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* 호버 효과에 사용될 속성 및 시간 설정 */
+}
+
+.home-container button:hover {
+    color: #FFFFFF; /* 호버 시 글자색 */
+    background-color: #8A2BE2; /* 호버 시 배경색 */
+}
+
