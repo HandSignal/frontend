@@ -95,21 +95,39 @@ const App = () => {
   };
 
   const saveDataToJson = () => {
-    // pose_keypoints, left_hand_keypoints, right_hand_keypoints를 모아서 출력할 배열 초기화
+    // 포즈, 왼손, 오른손 키포인트 배열 초기화
     let poseKeypointsArray: any[] = [];
     let leftHandKeypointsArray: any[] = [];
     let rightHandKeypointsArray: any[] = [];
   
-    // recordedData 배열을 순회하면서 각 레코드에서 키포인트를 추출하여 해당 배열에 추가
+    // recordedData 배열을 순회하면서 각 레코드에서 키포인트를 추출하여 배열에 추가
     recordedData.forEach(result => {
       if (result.pose_keypoints) {
-        poseKeypointsArray = poseKeypointsArray.concat(result.pose_keypoints);
+        const formattedPoseKeypoints = result.pose_keypoints.map((point: any) => ({
+          x: point[0],
+          y: point[1],
+          z: point[2],
+          visibility: point[3] || 0  // visibility가 없다면 기본값 0
+        }));
+        poseKeypointsArray = poseKeypointsArray.concat(formattedPoseKeypoints);
       }
       if (result.left_hand_keypoints) {
-        leftHandKeypointsArray = leftHandKeypointsArray.concat(result.left_hand_keypoints);
+        const formattedLeftHandKeypoints = result.left_hand_keypoints.map((point: any) => ({
+          x: point[0],
+          y: point[1],
+          z: point[2],
+          visibility: point[3] || 0  // visibility가 없다면 기본값 0
+        }));
+        leftHandKeypointsArray = leftHandKeypointsArray.concat(formattedLeftHandKeypoints);
       }
       if (result.right_hand_keypoints) {
-        rightHandKeypointsArray = rightHandKeypointsArray.concat(result.right_hand_keypoints);
+        const formattedRightHandKeypoints = result.right_hand_keypoints.map((point: any) => ({
+          x: point[0],
+          y: point[1],
+          z: point[2],
+          visibility: point[3] || 0  // visibility가 없다면 기본값 0
+        }));
+        rightHandKeypointsArray = rightHandKeypointsArray.concat(formattedRightHandKeypoints);
       }
     });
   
@@ -131,6 +149,7 @@ const App = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  
   
   
 
