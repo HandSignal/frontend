@@ -1,6 +1,5 @@
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
-import { HAND_CONNECTIONS, POSE_CONNECTIONS, FACEMESH_TESSELATION, Results } from "@mediapipe/holistic";
-
+import { HAND_CONNECTIONS, POSE_CONNECTIONS, Results } from "@mediapipe/holistic";
 export const drawCanvas = (ctx: CanvasRenderingContext2D, results: Results) => {
   const width = ctx.canvas.width;
   const height = ctx.canvas.height;
