@@ -44,12 +44,29 @@ const App = () => {
   // Mediapipe Holistic 결과 처리 및 녹화 데이터 저장
   const onResults = useCallback((results: Results) => {
     const canvasCtx = canvasRef.current!.getContext("2d")!;
+    
+    // 캔버스에 결과 그리기
     drawCanvas(canvasCtx, results);
 
+    // 필요한 키포인트 데이터 추출
+    const poseKeypoints = results.poseLandmarks?.map(point => [point.x, point.y, point.z]);
+    const leftHandKeypoints = results.leftHandLandmarks?.map(point => [point.x, point.y, point.z]);
+    const rightHandKeypoints = results.rightHandLandmarks?.map(point => [point.x, point.y, point.z]);
+
+    // 녹화 중이라면 데이터 저장
     if (isRecording) {
-      setRecordedData((prevData) => [...prevData, results]);
+      setRecordedData(prevData => [
+        ...prevData,
+        {
+          pose_keypoint: poseKeypoints || [],
+          left_hand_keypoint: leftHandKeypoints || [],
+          right_hand_keypoint: rightHandKeypoints || [],
+        },
+      ]);
     }
   }, [isRecording]);
+
+
 
   // 웹캠과 Mediapipe Holistic 모델 연결
   useEffect(() => {
