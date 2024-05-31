@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { Holistic, Results } from "@mediapipe/holistic";
-import { drawCanvas } from "./utils/drawCanvas";
-import * as styles from "./video"; // 스타일 임포트
+import { drawCanvas } from "../utils/drawCanvas";
+import * as styles from "./Recognize_style"; // 스타일 임포트
 
 const Recognize = () => {
   // 웹캠 및 캔버스 레퍼런스 설정
