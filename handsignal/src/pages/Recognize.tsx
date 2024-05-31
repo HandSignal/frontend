@@ -145,6 +145,7 @@ const Recognize = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+  
 
   return (
     <div className={styles.container}>
@@ -173,8 +174,7 @@ const Recognize = () => {
         <button
           className={styles.button}
           onClick={saveDataToJson}
-          disabled={!recordedData.length}
-        >
+          disabled={!recordedData.length}>
           JSON으로 데이터 저장
         </button>
       </div>
