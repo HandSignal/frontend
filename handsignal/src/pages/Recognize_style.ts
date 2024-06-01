@@ -1,7 +1,7 @@
 import { css } from "@emotion/css";
 
 export const container = css`
-  background-color: #000000; /* 검정색 배경색 */
+  background-color: #25AEF2; /* 검정색 배경색 */
   position: relative;
   width: 100vw;
   height: 100vh;
@@ -30,8 +30,8 @@ export const buttonContainer = css`
 `;
 
 export const button = css`
-  color: #8A2BE2; /* 호버 시 글자색 */
-  background-color: #E4B9FF; /* 호버 시 배경색 */
+  color: #1187CF; /* 호버 시 글자색 */
+  background-color: #FFFFFF; /* 호버 시 배경색 */
   font-size: 1rem;
   border: none;
   border-radius: 10px;
@@ -41,6 +41,6 @@ export const button = css`
 
   &:hover {
     color: #FFFFFF; /* 호버 글씨 색상 */
-    background-color: #8A2BE2; /* 호버 배경 색상 */
+    background-color: #0E6CA5; /* 호버 배경 색상 */
   }
 `;
