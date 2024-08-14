@@ -48,7 +48,7 @@ const Nav: React.FC = () => {
           수화 통화
         </button>
         <button
-          onClick={() => navigate("/section3")}
+          onClick={() => navigate("/mypage")}
           className={styles.navButton}
         >
           마이페이지
