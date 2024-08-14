@@ -1,0 +1,124 @@
+.pageContainer {
+  background: linear-gradient(to bottom right, #fff4dd, #f6cf7a);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  box-sizing: border-box;
+  padding-top: 64px;
+}
+
+.pageHeader {
+  margin-top: 64px;
+  text-align: center;
+  margin-bottom: 32px;
+  color: #333;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.formContainer {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 700px;
+  opacity: 0;
+  animation: fadeInUp 1s ease-in-out 0.5s forwards;
+}
+
+.inputGroup {
+  margin-bottom: 24px;
+}
+
+.input {
+  width: 90%;
+  padding: 12px;
+  padding-left: 15px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.input:focus {
+  border-color: #f6cf7a;
+  outline: none;
+}
+
+.passwordLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox {
+  margin-left: 8px;
+}
+
+.submitButton {
+  margin-right: 14px;
+  padding: 12px;
+  border: none;
+  border-radius: 30px;
+  background-color: #311505;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-top: 16px;
+}
+
+.submitButton:hover {
+  background-color: #ffc851;
+  transform: scale(1.05);
+}
+
+.deleteButton {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  background-color: #ffc851;
+  color: black;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 16px;
+}
+
+.deleteButton:hover {
+  background-color: #311505;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.passwordWrapper {
+  position: relative;
+}
+
+.passwordInput {
+  width: calc(100% - 40px); /* 버튼의 너비를 제외한 나머지 너비 */
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 10px; /* 버튼의 위치를 조정 */
+  top: 80%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
