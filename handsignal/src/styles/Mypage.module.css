@@ -37,9 +37,8 @@
 }
 
 .input {
-  width: 90%;
+  width: 100%;
   padding: 12px;
-  padding-left: 15px;
   margin-top: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
@@ -52,14 +51,23 @@
   outline: none;
 }
 
-.passwordLabel {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.passwordWrapper {
+  position: relative;
 }
 
-.checkbox {
-  margin-left: 8px;
+.passwordInput {
+  width: 100%;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 10px;
+  top: 80%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background: transparent; /* 버튼의 배경 제거 */
+  border: none; /* 버튼의 테두리 제거 */
+  padding: 0; /* 버튼의 패딩 제거 */
 }
 
 .submitButton {
@@ -105,20 +113,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.passwordWrapper {
-  position: relative;
-}
-
-.passwordInput {
-  width: calc(100% - 40px); /* 버튼의 너비를 제외한 나머지 너비 */
-}
-
-.passwordToggle {
-  position: absolute;
-  right: 10px; /* 버튼의 위치를 조정 */
-  top: 80%;
-  transform: translateY(-50%);
-  cursor: pointer;
 }
