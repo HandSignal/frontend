@@ -1,3 +1,29 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.homeContainer {
+  background: linear-gradient(to bottom right, #ffecc4, #ffc851);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  padding-top: 4rem;
+}
+
+.homeHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
 .homeNav {
   position: fixed;
   top: 0;
@@ -6,17 +32,15 @@
   background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   gap: 1rem;
   padding: 1rem 2rem;
   box-sizing: border-box;
   z-index: 1000;
-  transition: transform 0.3s ease;
 }
 
 .navButton {
-  font-size: 15px;
+  font-size: 17px;
   background: none;
   color: #000;
   border: none;
@@ -49,11 +73,6 @@
   display: none;
 }
 
-.navToggleImage {
-  padding-top: 3px;
-  width: 100px;
-}
-
 .navToggleLabel {
   display: none;
 }
@@ -61,19 +80,42 @@
 .navMenu {
   display: flex;
   gap: 1rem;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: flex-start;
+}
+
+/* 토글 상태일 때 메뉴가 가운데 정렬되도록 */
+.navToggleCheckbox:checked ~ .navMenu {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* 토글 버튼을 오른쪽에 정렬 */
+.navToggleWrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .navLogo {
-  margin-top: 8px;
-  width: 110px;
-  height: 20px;
+  width: 120px;
+  height: 25px;
 }
 
+/* 미디어 쿼리로 토글 버튼과 내비게이션 바의 형식 변경 */
 @media (max-width: 768px) {
   .homeNav {
     flex-direction: column;
     align-items: center;
     padding: 1rem;
+  }
+
+  .navToggleWrapper {
+    margin-bottom: 1rem;
   }
 
   .navToggle {
@@ -83,8 +125,6 @@
     font-size: 2rem;
     cursor: pointer;
     color: #000;
-    margin-left: auto;
-    margin-bottom: 1rem;
   }
 
   .navToggleLabel {

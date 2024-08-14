@@ -26,11 +26,7 @@ const Nav: React.FC = () => {
         className={styles.navToggleCheckbox}
       />
       <label htmlFor="navToggle" className={styles.navToggleLabel}>
-        <img
-          src={top_logo}
-          alt="Navigation Toggle"
-          className={styles.navToggleImage}
-        />
+        &#9776;
       </label>
       <div className={styles.navMenu}>
         <img
@@ -40,28 +36,22 @@ const Nav: React.FC = () => {
           style={{ cursor: "pointer" }}
         />
         <button
-          onClick={() => navigate("/section1")}
+          onClick={() => navigate("/recognize")}
           className={styles.navButton}
         >
-          section1
+          수화 번역기
         </button>
         <button
           onClick={() => navigate("/section2")}
           className={styles.navButton}
         >
-          section2
+          수화 통화
         </button>
         <button
           onClick={() => navigate("/section3")}
           className={styles.navButton}
         >
-          section3
-        </button>
-        <button
-          onClick={() => navigate("/section4")}
-          className={styles.navButton}
-        >
-          section4
+          마이페이지
         </button>
         <button
           onClick={handleLogout}

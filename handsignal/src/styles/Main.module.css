@@ -42,30 +42,6 @@ body {
   transition: transform 0.3s ease;
 }
 
-.navButton {
-  font-size: 15px;
-  background: none;
-  color: #000;
-  border: none;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  transition: color 0.3s;
-  text-align: center;
-  font-weight: 600 !important;
-}
-
-.navButton:hover {
-  color: #555;
-}
-
-.logoutButton {
-  color: #d9534f;
-}
-
-.logoutButton:hover {
-  color: #c9302c;
-}
-
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -95,68 +71,6 @@ body {
   background: #ffffff;
   transform: scale(2);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.navToggle {
-  display: none;
-}
-
-.navToggleCheckbox {
-  display: none;
-}
-
-.navToggleImage {
-  padding-top: 3px;
-  width: 100px;
-}
-
-.navToggleLabel {
-  display: none;
-}
-
-.navMenu {
-  display: flex;
-  gap: 1rem;
-}
-
-.navLogo {
-  margin-top: 8px;
-  width: 110px;
-  height: 20px;
-}
-
-@media (max-width: 768px) {
-  .homeNav {
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem;
-  }
-
-  .navToggle {
-    display: block;
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #000;
-    margin-left: auto;
-    margin-bottom: 1rem;
-  }
-
-  .navToggleLabel {
-    display: block;
-  }
-
-  .navMenu {
-    display: none;
-    flex-direction: column;
-    width: 100%;
-    gap: 0.5rem;
-  }
-
-  .navToggleCheckbox:checked ~ .navMenu {
-    display: flex;
-  }
 }
 
 .headerLogo {
