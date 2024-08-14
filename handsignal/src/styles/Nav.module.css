@@ -1,30 +1,3 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-
-.homeContainer {
-  background: linear-gradient(to bottom right, #fff4dd, #f6cf7a);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  box-sizing: border-box;
-  padding-top: 4rem;
-}
-
-.homeHeader {
-  margin-top: 4rem;
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
 .homeNav {
   position: fixed;
   top: 0;
@@ -51,7 +24,7 @@ body {
   cursor: pointer;
   transition: color 0.3s;
   text-align: center;
-  font-weight: 600 !important;
+  font-weight: 600;
 }
 
 .navButton:hover {
@@ -64,43 +37,6 @@ body {
 
 .logoutButton:hover {
   color: #c9302c;
-}
-
-.cardGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  width: 100%;
-  max-width: 1200px;
-  margin-top: 1rem;
-}
-
-@media (max-width: 1200px) {
-  .cardGrid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 900px) {
-  .cardGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.card {
-  background: #f4f4f4;
-  padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  text-align: center;
-  transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.card:hover {
-  background: #ffffff;
-  transform: scale(2);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .navToggle {
@@ -163,10 +99,4 @@ body {
   .navToggleCheckbox:checked ~ .navMenu {
     display: flex;
   }
-}
-
-.headerLogo {
-  width: 200px;
-  height: auto;
-  margin: 0 auto;
 }
