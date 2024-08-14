@@ -28,14 +28,17 @@
 }
 
 .login-container {
+  margin: 0 60px;
   text-align: center;
   color: #000000;
+  max-width: 400px;
+  width: 100%;
 }
 
 .login-container h2 {
-  margin-bottom: 24px;
-  font-size: 2rem;
-  color: #000000;
+  margin-bottom: 50px;
+  font-size: 32px;
+  color: #471d06;
 }
 
 .input-group {
@@ -44,32 +47,62 @@
 }
 
 .input-group label {
+  font-weight: 700;
   display: block;
+  margin-left: 20px;
   margin-bottom: 8px;
-  font-size: 1rem;
+  font-size: 20px;
   color: #000000;
 }
 
 .input-group input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1rem;
+  width: 90%;
+  padding: 10px 0;
+  padding-left: 20px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+  font-size: 20px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 100px;
 }
 
-button {
+.error-message {
+  color: red;
+  margin-top: 10px;
+  font-weight: 700;
+}
+
+.button-container {
   width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.left-button,
+.right-button {
+  width: 45%;
   padding: 12px;
-  font-size: 1.2rem;
-  color: #ffffff;
-  background-color: #6d4934;
   border: none;
-  border-radius: 5px;
+  border-radius: 50px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-size: 18px;
+  transition: background-color 0.5s;
+}
+
+.left-button {
+  background-color: #d0b4a3;
+  color: #6d4934;
+}
+
+.right-button {
+  margin-left: 10px;
+  background-color: #6d4934;
+  color: #fff;
 }
 
 button:hover {
   background-color: #a67c52;
+  color: #fff;
 }

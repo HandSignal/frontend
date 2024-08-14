@@ -3,7 +3,7 @@ import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
-import * as styles from "./Recognize_style"; // 스타일 임포트
+import * as styles from "../styles/Recognize_style"; // 스타일 임포트
 
 const Recognize = () => {
   // 웹캠 및 캔버스 레퍼런스 설정
@@ -42,29 +42,47 @@ const Recognize = () => {
   }, [holistic]);
 
   // Mediapipe Holistic 결과 처리 및 녹화 데이터 저장
-  const onResults = useCallback((results: Results) => {
-    const canvasCtx = canvasRef.current!.getContext("2d")!;
+  const onResults = useCallback(
+    (results: Results) => {
+      const canvasCtx = canvasRef.current!.getContext("2d")!;
 
-    // 캔버스에 결과 그리기
-    drawCanvas(canvasCtx, results);
+      // 캔버스에 결과 그리기
+      drawCanvas(canvasCtx, results);
 
-    // 필요한 키포인트 데이터 추출
-    const poseKeypoints = results.poseLandmarks?.map(point => [point.x, point.y, point.z, point.visibility]);
-    const leftHandKeypoints = results.leftHandLandmarks?.map(point => [point.x, point.y, point.z, point.visibility]);
-    const rightHandKeypoints = results.rightHandLandmarks?.map(point => [point.x, point.y, point.z, point.visibility]);
-
-    // 녹화 중이라면 데이터 저장
-    if (isRecording) {
-      setRecordedData((prevData: any[]) => [
-        ...prevData,
-        {
-          pose_keypoints: poseKeypoints || [],
-          left_hand_keypoints: leftHandKeypoints || [],
-          right_hand_keypoints: rightHandKeypoints || [],
-        }
+      // 필요한 키포인트 데이터 추출
+      const poseKeypoints = results.poseLandmarks?.map((point) => [
+        point.x,
+        point.y,
+        point.z,
+        point.visibility,
       ]);
-    }
-  }, [isRecording]);
+      const leftHandKeypoints = results.leftHandLandmarks?.map((point) => [
+        point.x,
+        point.y,
+        point.z,
+        point.visibility,
+      ]);
+      const rightHandKeypoints = results.rightHandLandmarks?.map((point) => [
+        point.x,
+        point.y,
+        point.z,
+        point.visibility,
+      ]);
+
+      // 녹화 중이라면 데이터 저장
+      if (isRecording) {
+        setRecordedData((prevData: any[]) => [
+          ...prevData,
+          {
+            pose_keypoints: poseKeypoints || [],
+            left_hand_keypoints: leftHandKeypoints || [],
+            right_hand_keypoints: rightHandKeypoints || [],
+          },
+        ]);
+      }
+    },
+    [isRecording]
+  );
 
   // 웹캠과 Mediapipe Holistic 모델 연결
   useEffect(() => {
@@ -97,33 +115,43 @@ const Recognize = () => {
     let rightHandKeypointsArray: any[] = [];
 
     // recordedData 배열을 순회하면서 각 레코드에서 키포인트를 추출하여 배열에 추가
-    recordedData.forEach(result => {
+    recordedData.forEach((result) => {
       if (result.pose_keypoints) {
-        const formattedPoseKeypoints = result.pose_keypoints.map((point: any) => ({
-          x: point[0],
-          y: point[1],
-          z: point[2],
-          visibility: point[3] || 0
-        }));
+        const formattedPoseKeypoints = result.pose_keypoints.map(
+          (point: any) => ({
+            x: point[0],
+            y: point[1],
+            z: point[2],
+            visibility: point[3] || 0,
+          })
+        );
         poseKeypointsArray = poseKeypointsArray.concat(formattedPoseKeypoints);
       }
       if (result.left_hand_keypoints) {
-        const formattedLeftHandKeypoints = result.left_hand_keypoints.map((point: any) => ({
-          x: point[0],
-          y: point[1],
-          z: point[2],
-          visibility: point[3] || 0
-        }));
-        leftHandKeypointsArray = leftHandKeypointsArray.concat(formattedLeftHandKeypoints);
+        const formattedLeftHandKeypoints = result.left_hand_keypoints.map(
+          (point: any) => ({
+            x: point[0],
+            y: point[1],
+            z: point[2],
+            visibility: point[3] || 0,
+          })
+        );
+        leftHandKeypointsArray = leftHandKeypointsArray.concat(
+          formattedLeftHandKeypoints
+        );
       }
       if (result.right_hand_keypoints) {
-        const formattedRightHandKeypoints = result.right_hand_keypoints.map((point: any) => ({
-          x: point[0],
-          y: point[1],
-          z: point[2],
-          visibility: point[3] || 0
-        }));
-        rightHandKeypointsArray = rightHandKeypointsArray.concat(formattedRightHandKeypoints);
+        const formattedRightHandKeypoints = result.right_hand_keypoints.map(
+          (point: any) => ({
+            x: point[0],
+            y: point[1],
+            z: point[2],
+            visibility: point[3] || 0,
+          })
+        );
+        rightHandKeypointsArray = rightHandKeypointsArray.concat(
+          formattedRightHandKeypoints
+        );
       }
     });
 
@@ -131,7 +159,7 @@ const Recognize = () => {
     const formattedData = {
       pose_keypoints: poseKeypointsArray,
       left_hand_keypoints: leftHandKeypointsArray,
-      right_hand_keypoints: rightHandKeypointsArray
+      right_hand_keypoints: rightHandKeypointsArray,
     };
 
     const jsonData = JSON.stringify(formattedData, null, 2); // JSON 형식으로 변환하고 들여쓰기 적용
@@ -145,7 +173,6 @@ const Recognize = () => {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  
 
   return (
     <div className={styles.container}>
@@ -174,7 +201,8 @@ const Recognize = () => {
         <button
           className={styles.button}
           onClick={saveDataToJson}
-          disabled={!recordedData.length}>
+          disabled={!recordedData.length}
+        >
           JSON으로 데이터 저장
         </button>
       </div>
