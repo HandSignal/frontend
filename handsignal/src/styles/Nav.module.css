@@ -1,0 +1,144 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.homeContainer {
+  background: linear-gradient(to bottom right, #ffecc4, #ffc851);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  padding-top: 4rem;
+}
+
+.homeHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.homeNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+  z-index: 1000;
+}
+
+.navButton {
+  font-size: 17px;
+  background: none;
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: color 0.3s;
+  text-align: center;
+  font-weight: 600;
+}
+
+.navButton:hover {
+  color: #ffb415;
+  background-color: transparent;
+}
+
+.logoutButton {
+  color: #d9534f;
+}
+
+.logoutButton:hover {
+  font-weight: 800;
+  color: #c9302c;
+}
+
+.navToggle {
+  display: none;
+}
+
+.navToggleCheckbox {
+  display: none;
+}
+
+.navToggleLabel {
+  display: none;
+}
+
+.navMenu {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: flex-start;
+}
+
+/* 토글 상태일 때 메뉴가 가운데 정렬되도록 */
+.navToggleCheckbox:checked ~ .navMenu {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* 토글 버튼을 오른쪽에 정렬 */
+.navToggleWrapper {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.navLogo {
+  width: 120px;
+  height: 25px;
+}
+
+/* 미디어 쿼리로 토글 버튼과 내비게이션 바의 형식 변경 */
+@media (max-width: 768px) {
+  .homeNav {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .navToggleWrapper {
+    margin-bottom: 1rem;
+  }
+
+  .navToggle {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #000;
+  }
+
+  .navToggleLabel {
+    display: block;
+  }
+
+  .navMenu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .navToggleCheckbox:checked ~ .navMenu {
+    display: flex;
+  }
+}

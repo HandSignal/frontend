@@ -36,7 +36,7 @@
 }
 
 .login-container h2 {
-  margin-bottom: 50px;
+  margin-bottom: 24px;
   font-size: 32px;
   color: #471d06;
 }
@@ -51,7 +51,7 @@
   display: block;
   margin-left: 20px;
   margin-bottom: 8px;
-  font-size: 20px;
+  font-size: 16px;
   color: #000000;
 }
 
@@ -60,7 +60,7 @@
   padding: 10px 0;
   padding-left: 20px;
   margin-left: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   font-size: 20px;
   border: 1px solid #ccc;
   border-radius: 100px;
@@ -82,12 +82,12 @@
 
 .left-button,
 .right-button {
-  width: 45%;
+  width: 48%;
   padding: 12px;
   border: none;
-  border-radius: 50px;
+  border-radius: 5px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   transition: background-color 0.5s;
 }
 
@@ -97,7 +97,6 @@
 }
 
 .right-button {
-  margin-left: 10px;
   background-color: #6d4934;
   color: #fff;
 }
