@@ -28,7 +28,8 @@
 }
 
 .navButton:hover {
-  color: #555;
+  color: #ffb415;
+  background-color: transparent;
 }
 
 .logoutButton {
@@ -36,6 +37,7 @@
 }
 
 .logoutButton:hover {
+  font-weight: 800;
   color: #c9302c;
 }
 
