@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import "../styles/Login.css";
 import Logo from "../assets/HS_Logo.png";
 
@@ -7,6 +8,7 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [animationFinished, setAnimationFinished] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -16,7 +18,10 @@ const Login: React.FC = () => {
 
     if (username === validUsername && password === validPassword) {
       setError("");
-      navigate("/home");
+      setAnimationFinished(true);
+      setTimeout(() => {
+        navigate("/home");
+      }, 500);
     } else {
       setError("아이디 또는 비밀번호가 일치하지 않습니다.");
     }
@@ -27,11 +32,27 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="home-container">
-      <div className="left-section">
+    <motion.div
+      className="home-container"
+      initial={{ opacity: 1 }}
+      animate={{ opacity: animationFinished ? 0 : 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <motion.div
+        className="left-section"
+        initial={{ x: animationFinished ? "0" : "-100%" }}
+        animate={{ x: animationFinished ? "-100%" : "0" }}
+        transition={{ duration: 0.5 }}
+      >
         <img src={Logo} alt="Logo" className="logo" />
-      </div>
-      <div className="right-section">
+      </motion.div>
+      <motion.div
+        className="right-section"
+        initial={{ x: animationFinished ? "0" : "100%" }}
+        animate={{ x: animationFinished ? "100%" : "0" }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="login-container">
           <h2>Login</h2>
           <form onSubmit={handleSubmit} className="login-form">
@@ -72,8 +93,8 @@ const Login: React.FC = () => {
             </div>
           </form>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

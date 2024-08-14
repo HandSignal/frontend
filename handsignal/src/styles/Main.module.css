@@ -1,0 +1,167 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.homeContainer {
+  background: linear-gradient(to bottom right, #ffecc4, #ffc851);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+  padding-top: 4rem;
+}
+
+.homeHeader {
+  margin-top: 4rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.homeNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+/* 내비게이션 바의 버튼 스타일 */
+.navButton {
+  font-size: 15px;
+  background: none;
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: color 0.3s;
+  text-align: center;
+  font-weight: 600 !important;
+}
+
+.navButton:hover {
+  color: #555;
+}
+
+.logoutButton {
+  color: #d9534f;
+}
+
+.logoutButton:hover {
+  color: #c9302c;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .cardGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.card {
+  background: #f4f4f4;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.card:hover {
+  transform: scale(2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.navToggle {
+  display: none;
+}
+
+.navToggleCheckbox {
+  display: none;
+}
+
+.navToggleImage {
+  padding-top: 3px;
+  width: 100px;
+}
+
+.navToggleLabel {
+  display: none;
+}
+
+.navMenu {
+  display: flex;
+  gap: 1rem;
+}
+
+/* 미디어 쿼리로 토글 버튼과 내비게이션 바의 형식 변경 */
+@media (max-width: 768px) {
+  .homeNav {
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .navToggle {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #000;
+    margin-left: auto;
+    margin-bottom: 1rem;
+  }
+
+  .navToggleLabel {
+    display: block;
+  }
+
+  .navMenu {
+    display: none; /* 기본적으로 숨김 */
+    flex-direction: column;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .navToggleCheckbox:checked ~ .navMenu {
+    display: flex; /* 체크박스가 체크되면 메뉴 표시 */
+  }
+}
+
+.headerLogo {
+  width: 200px;
+  height: auto;
+  margin: 0 auto; /* 중앙 정렬 */
+}
