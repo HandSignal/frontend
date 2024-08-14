@@ -1,0 +1,108 @@
+.home-container {
+  background-color: #ffecc4;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+}
+
+.left-section,
+.right-section {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-section {
+  background-image: linear-gradient(to bottom right, #a67c52, #512f1b);
+}
+
+.logo {
+  max-width: 40%;
+  height: auto;
+}
+
+.right-section {
+  background-color: #ffffff;
+}
+
+.login-container {
+  margin: 0 60px;
+  text-align: center;
+  color: #000000;
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-container h2 {
+  margin-bottom: 50px;
+  font-size: 32px;
+  color: #471d06;
+}
+
+.input-group {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.input-group label {
+  font-weight: 700;
+  display: block;
+  margin-left: 20px;
+  margin-bottom: 8px;
+  font-size: 20px;
+  color: #000000;
+}
+
+.input-group input {
+  width: 90%;
+  padding: 10px 0;
+  padding-left: 20px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+  font-size: 20px;
+  border: 1px solid #ccc;
+  border-radius: 100px;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+  font-weight: 700;
+}
+
+.button-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.left-button,
+.right-button {
+  width: 45%;
+  padding: 12px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background-color 0.5s;
+}
+
+.left-button {
+  background-color: #d0b4a3;
+  color: #6d4934;
+}
+
+.right-button {
+  margin-left: 10px;
+  background-color: #6d4934;
+  color: #fff;
+}
+
+button:hover {
+  background-color: #a67c52;
+  color: #fff;
+}
