@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import top_logo from "../assets/Single_HandSignal.png";
 import styles from "../styles/Nav.module.css";
-import Modal from "./Modal";
+import Modal from "./LogoutModal";
 
 const Nav: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

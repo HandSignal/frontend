@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../styles/Modal.module.css";
+import styles from "../styles/LogoutModal.module.css";
 
 interface ModalProps {
   isOpen: boolean;
