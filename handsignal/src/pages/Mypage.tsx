@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import styles from "../styles/Mypage.module.css";
 import Nav from "./Nav";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // 아이콘 추가
 
 // 사용자 데이터 타입 정의
 interface UserData {
@@ -11,58 +12,45 @@ interface UserData {
 
 // 컴포넌트
 const Mypage: React.FC = () => {
-  // 초기 사용자 데이터
   const initialUserData: UserData = {
     username: "Hyeonseo",
     password: "히히 비밀번호가 보입니다",
     nickname: "Kittyismylife",
   };
 
-  // 사용자 데이터 상태
   const [userData, setUserData] = useState<UserData>(initialUserData);
-  // 폼 데이터 상태
-  const [formData, setFormData] = useState<UserData>({
-    username: userData.username,
-    password: userData.password,
-    nickname: userData.nickname,
-  });
-  // 비밀번호 보이기/숨기기 상태
+  const [formData, setFormData] = useState<UserData>({ ...initialUserData });
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
-  // 입력 값 변경 핸들러
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       [name]: value,
-    });
+    }));
   };
 
-  // 폼 제출 핸들러
   const handleSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    // 사용자 데이터 업데이트
     setUserData(formData);
     alert("정보가 수정되었습니다!");
   };
 
-  // 회원탈퇴 핸들러
   const handleDelete = (): void => {
     if (window.confirm("정말로 회원탈퇴하시겠습니까?")) {
-      // 회원탈퇴 로직 (예: API 호출)
+      // 실제 회원탈퇴 로직
       alert("회원탈퇴가 완료되었습니다.");
     }
   };
 
-  // 비밀번호 보이기/숨기기 토글 핸들러
   const togglePasswordVisibility = (): void => {
-    setPasswordVisible(!passwordVisible);
+    setPasswordVisible((prevVisible) => !prevVisible);
   };
 
   return (
     <div className={styles.pageContainer}>
       <Nav />
-      <h1 className={styles.pageHeader}>마이페이지</h1>
+      <h1 className={styles.pageHeader}>✨ My Profile ✨</h1>
       <div className={styles.formContainer}>
         <form onSubmit={handleSubmit}>
           <div className={styles.inputGroup}>
@@ -88,12 +76,13 @@ const Mypage: React.FC = () => {
                 onChange={handleChange}
                 className={`${styles.input} ${styles.passwordInput}`}
               />
-              <input
-                type="checkbox"
-                checked={passwordVisible}
-                onChange={togglePasswordVisibility}
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
                 className={styles.passwordToggle}
-              />
+              >
+                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+              </button>
             </label>
           </div>
           <div className={styles.inputGroup}>
@@ -108,12 +97,18 @@ const Mypage: React.FC = () => {
               />
             </label>
           </div>
-          <button type="submit" className={styles.submitButton}>
-            회원정보 수정
-          </button>
-          <button onClick={handleDelete} className={styles.deleteButton}>
-            회원탈퇴
-          </button>
+          <div className={styles.buttonGroup}>
+            <button
+              type="button"
+              onClick={handleDelete}
+              className={styles.deleteButton}
+            >
+              회원탈퇴
+            </button>
+            <button type="submit" className={styles.submitButton}>
+              회원정보 수정
+            </button>
+          </div>
         </form>
       </div>
     </div>
