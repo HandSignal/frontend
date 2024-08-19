@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+// src/pages/Recognize.tsx
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { Holistic, Results } from "@mediapipe/holistic";
@@ -6,7 +7,7 @@ import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
 
-const Recognize = () => {
+const Recognize: React.FC = () => {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraRef = useRef<Camera | null>(null);
@@ -65,7 +66,7 @@ const Recognize = () => {
 
       return () => {
         if (holistic) {
-          (holistic as Holistic).close();
+          // `close` 메서드가 없을 경우, 객체를 null로 설정
           setHolistic(null);
         }
       };
@@ -159,7 +160,6 @@ const Recognize = () => {
     }
 
     if (isCountdownActive) {
-      // 카운트다운이 진행 중일 때 녹화 중지 버튼을 누르면 카운트다운을 중지하고 녹화도 중지합니다.
       setIsCountdownActive(false);
       setCountdown(0);
       setIsRecording(false);
@@ -168,11 +168,9 @@ const Recognize = () => {
     }
 
     if (isRecording) {
-      // 이미 녹화 중인 경우 녹화 중지
       setIsRecording(false);
       setIsRecordingIndicatorVisible(false);
     } else {
-      // 녹화를 시작하는 경우
       setIsCountdownActive(true);
       setCountdown(3);
       setIsRecordingIndicatorVisible(true);
