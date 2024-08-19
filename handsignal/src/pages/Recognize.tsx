@@ -3,25 +3,74 @@ import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
-import * as styles from "../styles/Recognize_style"; // 스타일 임포트
+import "../styles/Recognize.css";
+import Nav from "./Nav";
+
+// 타입 정의
+interface Keypoint {
+  x: number;
+  y: number;
+  z: number;
+  visibility: number;
+}
+
+interface FrameData {
+  pose_keypoints: Keypoint[][];
+  left_hand_keypoints: Keypoint[][];
+  right_hand_keypoints: Keypoint[][];
+}
 
 const Recognize = () => {
-  // 웹캠 및 캔버스 레퍼런스 설정
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cameraRef = useRef<Camera | null>(null);
 
-  // Mediapipe Holistic 모델 및 녹화 관련 상태 설정
   const [holistic, setHolistic] = useState<Holistic | null>(null);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordedData, setRecordedData] = useState<any[]>([]);
+  const [recordedData, setRecordedData] = useState<FrameData>({
+    pose_keypoints: [],
+    left_hand_keypoints: [],
+    right_hand_keypoints: [],
+  });
+  const [cameraPermission, setCameraPermission] = useState<boolean | null>(
+    null
+  );
+  const [isCameraOn, setIsCameraOn] = useState(false);
 
-  // Mediapipe Holistic 모델 초기화 및 설정
+  // 카운트다운 및 녹화 상태 관련 상태 변수
+  const [countdown, setCountdown] = useState<number>(0);
+  const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
+  const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
+    useState<boolean>(false);
+
+  // 카메라 권한 요청 및 상태 관리
   useEffect(() => {
-    if (!holistic) {
+    const requestCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        if (stream) {
+          setCameraPermission(true);
+          stream.getTracks().forEach((track) => track.stop()); // 테스트 후 스트림 중지
+        } else {
+          setCameraPermission(false);
+        }
+      } catch (error) {
+        console.error("Camera permission error:", error);
+        setCameraPermission(false);
+      }
+    };
+
+    requestCameraPermission();
+  }, []);
+
+  // Mediapipe Holistic 객체 초기화
+  useEffect(() => {
+    if (cameraPermission === true && holistic === null) {
       const newHolistic = new Holistic({
-        locateFile: (file) => {
-          return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
-        },
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
       });
 
       newHolistic.setOptions({
@@ -31,138 +80,192 @@ const Recognize = () => {
       });
 
       setHolistic(newHolistic);
+
+      return () => {
+        if (holistic) {
+          (holistic as Holistic).close();
+          setHolistic(null);
+        }
+      };
     }
+  }, [cameraPermission, holistic]);
 
-    // 컴포넌트 언마운트 시 Mediapipe Holistic 모델 종료
-    return () => {
-      if (holistic) {
-        holistic.close();
-      }
-    };
-  }, [holistic]);
-
-  // Mediapipe Holistic 결과 처리 및 녹화 데이터 저장
   const onResults = useCallback(
     (results: Results) => {
-      const canvasCtx = canvasRef.current!.getContext("2d")!;
+      const canvasCtx = canvasRef.current?.getContext("2d");
 
-      // 캔버스에 결과 그리기
-      drawCanvas(canvasCtx, results);
+      if (canvasCtx) {
+        drawCanvas(canvasCtx, results);
+      }
 
-      // 필요한 키포인트 데이터 추출
-      const poseKeypoints = results.poseLandmarks?.map((point) => [
-        point.x,
-        point.y,
-        point.z,
-        point.visibility,
-      ]);
-      const leftHandKeypoints = results.leftHandLandmarks?.map((point) => [
-        point.x,
-        point.y,
-        point.z,
-        point.visibility,
-      ]);
-      const rightHandKeypoints = results.rightHandLandmarks?.map((point) => [
-        point.x,
-        point.y,
-        point.z,
-        point.visibility,
-      ]);
+      const poseKeypoints: Keypoint[] =
+        results.poseLandmarks?.map((point) => ({
+          x: point.x,
+          y: point.y,
+          z: point.z,
+          visibility: point.visibility ?? 0, // Handle undefined with default value
+        })) || [];
 
-      // 녹화 중이라면 데이터 저장
+      const leftHandKeypoints: Keypoint[] =
+        results.leftHandLandmarks?.map((point) => ({
+          x: point.x,
+          y: point.y,
+          z: point.z,
+          visibility: point.visibility ?? 0, // Handle undefined with default value
+        })) || [];
+
+      const rightHandKeypoints: Keypoint[] =
+        results.rightHandLandmarks?.map((point) => ({
+          x: point.x,
+          y: point.y,
+          z: point.z,
+          visibility: point.visibility ?? 0, // Handle undefined with default value
+        })) || [];
+
       if (isRecording) {
-        setRecordedData((prevData: any[]) => [
-          ...prevData,
-          {
-            pose_keypoints: poseKeypoints || [],
-            left_hand_keypoints: leftHandKeypoints || [],
-            right_hand_keypoints: rightHandKeypoints || [],
-          },
-        ]);
+        setRecordedData((prevData) => ({
+          pose_keypoints: [...prevData.pose_keypoints, poseKeypoints],
+          left_hand_keypoints: [
+            ...prevData.left_hand_keypoints,
+            leftHandKeypoints,
+          ],
+          right_hand_keypoints: [
+            ...prevData.right_hand_keypoints,
+            rightHandKeypoints,
+          ],
+        }));
       }
     },
     [isRecording]
   );
 
-  // 웹캠과 Mediapipe Holistic 모델 연결
+  // 웹캠 및 Mediapipe Holistic 모델과 Camera 객체 연동
   useEffect(() => {
-    if (holistic && webcamRef.current) {
-      const camera = new Camera(webcamRef.current.video!, {
-        onFrame: async () => {
-          await holistic.send({ image: webcamRef.current!.video! });
-        },
-        width: 1280,
-        height: 720,
-      });
-      camera.start();
-      holistic.onResults(onResults);
+    if (cameraPermission === true && holistic && webcamRef.current) {
+      const video = webcamRef.current.video;
+      if (video) {
+        const camera = new Camera(video, {
+          onFrame: async () => {
+            try {
+              if (holistic) {
+                await holistic.send({ image: video });
+              }
+            } catch (error) {
+              console.error("Error sending image to holistic:", error);
+            }
+          },
+          width: 1280,
+          height: 720,
+        });
+
+        cameraRef.current = camera;
+
+        if (isCameraOn) {
+          camera.start();
+        } else {
+          camera.stop();
+        }
+
+        holistic.onResults(onResults);
+
+        return () => {
+          camera.stop();
+          cameraRef.current = null;
+        };
+      }
     }
-  }, [holistic, onResults]);
+  }, [holistic, onResults, cameraPermission, isCameraOn]);
 
   // 녹화 시작/중지 토글 함수
   const toggleRecording = () => {
-    setIsRecording((prev) => !prev);
-    if (!isRecording) {
-      setRecordedData([]); // 새로운 녹화 시작 시 기록된 데이터 초기화
+    if (!isCameraOn) {
+      alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
+      return;
+    }
+
+    if (isCountdownActive) {
+      // 카운트다운이 진행 중일 때 녹화 중지 버튼을 누르면 카운트다운을 중지하고 녹화도 중지합니다.
+      setIsCountdownActive(false);
+      setCountdown(0);
+      setIsRecording(false);
+      setIsRecordingIndicatorVisible(false);
+      return;
+    }
+
+    if (isRecording) {
+      // 이미 녹화 중인 경우 녹화 중지
+      setIsRecording(false);
+      setIsRecordingIndicatorVisible(false);
+    } else {
+      // 녹화를 시작하는 경우
+      setIsCountdownActive(true);
+      setCountdown(3);
+      setIsRecordingIndicatorVisible(true);
+
+      const countdownInterval = setInterval(() => {
+        setCountdown((prevCountdown) => {
+          if (prevCountdown === 1) {
+            clearInterval(countdownInterval);
+            setIsRecording(true);
+            setIsRecordingIndicatorVisible(false);
+            setRecordedData({
+              pose_keypoints: [],
+              left_hand_keypoints: [],
+              right_hand_keypoints: [],
+            });
+            setIsCountdownActive(false);
+          }
+          return prevCountdown - 1;
+        });
+      }, 1000);
     }
   };
 
-  // 녹화된 데이터를 JSON 파일로 저장하는 함수
-  const saveDataToJson = () => {
-    // 각 키포인트 배열 초기화
-    let poseKeypointsArray: any[] = [];
-    let leftHandKeypointsArray: any[] = [];
-    let rightHandKeypointsArray: any[] = [];
-
-    // recordedData 배열을 순회하면서 각 레코드에서 키포인트를 추출하여 배열에 추가
-    recordedData.forEach((result) => {
-      if (result.pose_keypoints) {
-        const formattedPoseKeypoints = result.pose_keypoints.map(
-          (point: any) => ({
-            x: point[0],
-            y: point[1],
-            z: point[2],
-            visibility: point[3] || 0,
-          })
-        );
-        poseKeypointsArray = poseKeypointsArray.concat(formattedPoseKeypoints);
+  // 카메라 기능 토글 함수
+  const toggleCamera = () => {
+    setIsCameraOn((prev) => {
+      const newStatus = !prev;
+      if (newStatus && webcamRef.current) {
+        const video = webcamRef.current.video;
+        if (video) {
+          const camera = new Camera(video, {
+            onFrame: async () => {
+              try {
+                if (holistic) {
+                  await holistic.send({ image: video });
+                }
+              } catch (error) {
+                console.error("Error sending image to holistic:", error);
+              }
+            },
+            width: 1280,
+            height: 720,
+          });
+          cameraRef.current = camera;
+          camera.start();
+          setHolistic((prevHolistic) => {
+            if (prevHolistic) {
+              prevHolistic.onResults(onResults);
+            }
+            return prevHolistic;
+          });
+        }
+      } else if (cameraRef.current) {
+        cameraRef.current.stop();
+        cameraRef.current = null;
       }
-      if (result.left_hand_keypoints) {
-        const formattedLeftHandKeypoints = result.left_hand_keypoints.map(
-          (point: any) => ({
-            x: point[0],
-            y: point[1],
-            z: point[2],
-            visibility: point[3] || 0,
-          })
-        );
-        leftHandKeypointsArray = leftHandKeypointsArray.concat(
-          formattedLeftHandKeypoints
-        );
-      }
-      if (result.right_hand_keypoints) {
-        const formattedRightHandKeypoints = result.right_hand_keypoints.map(
-          (point: any) => ({
-            x: point[0],
-            y: point[1],
-            z: point[2],
-            visibility: point[3] || 0,
-          })
-        );
-        rightHandKeypointsArray = rightHandKeypointsArray.concat(
-          formattedRightHandKeypoints
-        );
-      }
+      return newStatus;
     });
+  };
 
-    // 각 키포인트 배열을 하나의 객체로 합쳐서 JSON으로 변환
+  const saveDataToJson = () => {
     const formattedData = {
-      pose_keypoints: poseKeypointsArray,
-      left_hand_keypoints: leftHandKeypointsArray,
-      right_hand_keypoints: rightHandKeypointsArray,
+      pose_keypoint: recordedData.pose_keypoints,
+      left_hand_keypoint: recordedData.left_hand_keypoints,
+      right_hand_keypoint: recordedData.right_hand_keypoints,
     };
 
-    const jsonData = JSON.stringify(formattedData, null, 2); // JSON 형식으로 변환하고 들여쓰기 적용
+    const jsonData = JSON.stringify(formattedData, null, 2);
     const blob = new Blob([jsonData], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -175,38 +278,48 @@ const Recognize = () => {
   };
 
   return (
-    <div className={styles.container}>
-      {/* 웹캠 비디오 출력 */}
-      <Webcam
-        audio={false}
-        style={{ visibility: "hidden" }}
-        width={1280}
-        height={720}
-        ref={webcamRef}
-        screenshotFormat="image/jpeg"
-        videoConstraints={{ width: 1280, height: 720, facingMode: "user" }}
-      />
-      {/* Mediapipe Holistic 결과를 출력할 캔버스 */}
-      <canvas
-        ref={canvasRef}
-        className={styles.canvas}
-        width={1280}
-        height={720}
-      />
-      {/* 녹화 시작/중지 버튼 및 데이터 저장 버튼 */}
-      <div className={styles.buttonContainer}>
-        <button className={styles.button} onClick={toggleRecording}>
-          {isRecording ? "녹화 중지" : "녹화 시작"}
-        </button>
-        <button
-          className={styles.button}
-          onClick={saveDataToJson}
-          disabled={!recordedData.length}
-        >
-          JSON으로 데이터 저장
-        </button>
+    <>
+      <Nav />
+      <div className="container">
+        <Webcam
+          audio={false}
+          style={{ visibility: "hidden" }}
+          width={1280}
+          height={700}
+          ref={webcamRef}
+          screenshotFormat="image/jpeg"
+          videoConstraints={{ facingMode: "user" }}
+        />
+        <div className="buttonContainer">
+          <button
+            className="button"
+            onClick={toggleCamera}
+            disabled={cameraPermission === null}
+          >
+            {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
+          </button>
+          <button
+            className="button"
+            onClick={toggleRecording}
+            disabled={isCountdownActive}
+          >
+            {isRecording ? "녹화 중지" : "녹화 시작"}
+          </button>
+          <button
+            className="button"
+            onClick={saveDataToJson}
+            disabled={!recordedData.pose_keypoints.length}
+          >
+            데이터 저장
+          </button>
+        </div>
+        <canvas ref={canvasRef} className="canvas" width={1280} height={720} />
+        {isCountdownActive && <div className="countdown">{countdown}</div>}
+        {isRecordingIndicatorVisible && (
+          <div className="recording-indicator">녹화 중</div>
+        )}
       </div>
-    </div>
+    </>
   );
 };
 

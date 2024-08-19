@@ -1,17 +1,25 @@
-import React from "react";
+// src/components/Nav.tsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import top_logo from "../assets/Single_HandSignal.png";
 import styles from "../styles/Nav.module.css";
+import Modal from "./LogoutModal";
 
 const Nav: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    const confirmed = window.confirm("정말 로그아웃 하시겠습니까?");
-    if (confirmed) {
-      navigate("/");
-    }
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setIsModalOpen(false);
+    navigate("/");
+  };
+
+  const handleCancelLogout = () => {
+    setIsModalOpen(false);
   };
 
   const handleClick = () => {
@@ -48,7 +56,7 @@ const Nav: React.FC = () => {
           수화 통화
         </button>
         <button
-          onClick={() => navigate("/section3")}
+          onClick={() => navigate("/mypage")}
           className={styles.navButton}
         >
           마이페이지
@@ -60,6 +68,12 @@ const Nav: React.FC = () => {
           로그아웃
         </button>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCancelLogout}
+        onConfirm={handleConfirmLogout}
+      />
     </nav>
   );
 };

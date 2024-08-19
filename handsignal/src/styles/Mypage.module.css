@@ -1,0 +1,143 @@
+.pageContainer {
+  background: linear-gradient(to bottom right, #fff4dd, #f6cf7a);
+  background-size: 400% 400%;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  box-sizing: border-box;
+  padding-top: 64px;
+  animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.pageHeader {
+  margin-top: 64px;
+  text-align: center;
+  margin-bottom: 32px;
+  color: #333;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+.formContainer {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 700px;
+  opacity: 0;
+  animation: fadeInUp 1s ease-in-out 0.5s forwards;
+}
+
+.inputGroup {
+  margin-bottom: 24px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 10px;
+  margin-top: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #f6cf7a;
+  outline: none;
+}
+
+.passwordWrapper {
+  position: relative;
+}
+
+.passwordInput {
+  width: 100%;
+}
+
+.passwordToggle {
+  width: 20px;
+  position: absolute;
+  right: 18px;
+  top: 88%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.passwordToggle:hover {
+  border-radius: 20px;
+  background-color: #311505;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: space-between; /* 버튼을 양 끝에 배치 */
+  width: 100%;
+  margin-top: 16px;
+}
+
+.submitButton {
+  font-weight: 600;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  background-color: #311505;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.submitButton:hover {
+  background-color: #ffc851;
+  transform: scale(1.05);
+}
+
+.deleteButton {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 30px;
+  background-color: #c21616;
+  font-weight: 600;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.deleteButton:hover {
+  background-color: #ff3030;
+  transform: scale(1.1);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
