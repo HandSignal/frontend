@@ -1,0 +1,74 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+}
+
+.homeContainer {
+  background: linear-gradient(to bottom right, #fff4dd, #f6cf7a);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 2rem 2rem;
+  box-sizing: border-box;
+}
+
+.homeNav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+.headerLogo {
+  width: 150px; /* Adjusted size for better responsiveness */
+  height: auto;
+}
+
+.homeHeader {
+  margin-top: 5rem; /* Adjusted for fixed navbar */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 기본적으로 4개의 열 */
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .cardGrid {
+    grid-template-columns: repeat(
+      3,
+      1fr
+    ); /* 화면이 1200px 이하일 때 3개의 열 */
+  }
+}
+
+@media (max-width: 900px) {
+  .cardGrid {
+    grid-template-columns: repeat(2, 1fr); /* 화면이 900px 이하일 때 2개의 열 */
+  }
+}
+
+@media (max-width: 600px) {
+  .cardGrid {
+    grid-template-columns: 1fr; /* 화면이 600px 이하일 때 1개의 열 */
+  }
+}
