@@ -52,13 +52,13 @@ const Main: React.FC = () => {
           <motion.div
             key={index}
             className={styles.card}
-            onClick={() => navigate(`/page${(index % 4) + 1}`)}
+            onClick={() => navigate(`/page${index + 1}`)}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
-            aria-label={`카드 ${(index % 4) + 1}`}
+            aria-label={`카드 ${index + 1}`}
           >
-            <h3>카드 {(index % 4) + 1}</h3>
-            <p>카드 {(index % 4) + 1}의 설명</p>
+            <h3>카드 {index + 1}</h3>
+            <p>카드 {index + 1}의 설명</p>
           </motion.div>
         ))}
       </motion.main>

@@ -1,0 +1,33 @@
+.sign-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개의 카드 */
+  gap: 1rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto; /* 중앙 정렬 */
+  padding: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .sign-list {
+    grid-template-columns: repeat(
+      3,
+      1fr
+    ); /* 화면이 1200px 이하일 때 3개의 카드 */
+  }
+}
+
+@media (max-width: 900px) {
+  .sign-list {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* 화면이 900px 이하일 때 2개의 카드 */
+  }
+}
+
+@media (max-width: 600px) {
+  .sign-list {
+    grid-template-columns: 1fr; /* 화면이 600px 이하일 때 1개의 카드 */
+  }
+}

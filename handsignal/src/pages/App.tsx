@@ -6,6 +6,7 @@ import Recognize from "./Recognize";
 import Signup from "./Signup";
 import Main from "./Main";
 import MyPage from "./Mypage";
+import Page1 from "./Page1";
 
 const App: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const App: React.FC = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/recognize" element={<Recognize />} />;
           <Route path="/mypage" element={<MyPage />} />;
+          <Route path="/page1" element={<Page1 />} />
         </Routes>
       </AnimatePresence>
     </Router>
