@@ -5,6 +5,13 @@ import header_logo from "../assets/Single_HandSignal2.png";
 import styles from "../styles/Main.module.css";
 import Nav from "./Nav";
 
+const cardData = [
+  { title: "인사하기", description: "인사할 때, 알아두면 좋은 수어!" },
+  { title: "위급상황", description: "위급상황 시, 반드시 알아야 할 수어!" },
+  { title: "기본회화", description: "조금 더 원활한 대화를 위한 수어!" },
+  { title: "더보기", description: "좀 더 많은 수어를 보고 싶다면?" },
+];
+
 const Main: React.FC = () => {
   const navigate = useNavigate();
 
@@ -48,7 +55,7 @@ const Main: React.FC = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {Array.from({ length: 8 }, (_, index) => (
+        {cardData.map((card, index) => (
           <motion.div
             key={index}
             className={styles.card}
@@ -57,8 +64,8 @@ const Main: React.FC = () => {
             transition={{ type: "spring", stiffness: 300 }}
             aria-label={`카드 ${index + 1}`}
           >
-            <h3>카드 {index + 1}</h3>
-            <p>카드 {index + 1}의 설명</p>
+            <h3>{card.title}</h3>
+            <p>{card.description}</p>
           </motion.div>
         ))}
       </motion.main>
