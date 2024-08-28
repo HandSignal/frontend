@@ -1,10 +1,15 @@
 import React from "react";
 import SignList from "./SignList";
+import { useNavigate } from "react-router-dom";
+
 import styles from "../styles/Page.module.css";
-import header_logo from "../assets/Single_HandSignal2.png";
 import Nav from "./Nav";
 
 const Page1: React.FC = () => {
+  const navigate = useNavigate();
+  const handleHome = () => {
+    navigate("/home");
+  };
   return (
     <>
       <Nav />
@@ -16,6 +21,9 @@ const Page1: React.FC = () => {
         <div className={styles.cardGrid}>
           <SignList />
         </div>
+        <button onClick={handleHome} className={styles.back}>
+          돌아가기
+        </button>
       </div>
     </>
   );

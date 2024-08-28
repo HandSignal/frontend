@@ -43,13 +43,22 @@ body {
   margin-bottom: 2rem;
 }
 
-.cardGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 기본적으로 4개의 열 */
-  gap: 1rem;
-  width: 100%;
-  max-width: 1200px;
-  margin-top: 1rem;
+.back {
+  width: 20%;
+  margin-top: 20px;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: background-color 0.5s;
+  background-color: #6d4934;
+  color: #fff;
+}
+
+button:hover {
+  background-color: #a67c52;
+  color: #fff;
 }
 
 @media (max-width: 1200px) {
@@ -71,4 +80,21 @@ body {
   .cardGrid {
     grid-template-columns: 1fr; /* 화면이 600px 이하일 때 1개의 열 */
   }
+}
+
+/* 페이드인 애니메이션 정의 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* homeContainer에 페이드인 효과 적용 */
+.homeContainer {
+  animation: fadeIn 1s ease-in-out;
 }
