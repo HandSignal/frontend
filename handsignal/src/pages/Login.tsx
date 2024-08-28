@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import "../styles/Login.css";
 import Logo from "../assets/HS_Logo.png";
+import header_logo from "../assets/Single_HandSignal2.png";
+import styles from "../styles/Main.module.css";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -11,24 +13,8 @@ const Login: React.FC = () => {
   const [animationFinished, setAnimationFinished] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    const validUsername = "user";
-    const validPassword = "pass";
-
-    if (username === validUsername && password === validPassword) {
-      setError("");
-      setAnimationFinished(true);
-      setTimeout(() => {
-        navigate("/home");
-      }, 500);
-    } else {
-      setError("아이디 또는 비밀번호가 일치하지 않습니다.");
-    }
-  };
-
-  const handleSignup = () => {
-    navigate("/signup");
+  const handleHome = () => {
+    navigate("/home");
   };
 
   return (
@@ -54,44 +40,27 @@ const Login: React.FC = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="login-container">
-          <h2>Login</h2>
-          <form onSubmit={handleSubmit} className="login-form">
-            <div className="input-group">
-              <label htmlFor="username">아이디</label>
-              <input
-                type="text"
-                id="username"
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-group">
-              <label htmlFor="password">비밀번호</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            {error && <p className="error-message">{error}</p>}
-            <div className="button-container">
-              <button
-                type="button"
-                className="left-button"
-                onClick={handleSignup}
-              >
-                회원가입
-              </button>
-              <button type="submit" className="right-button">
-                로그인
-              </button>
-            </div>
-          </form>
+          <header className={styles.homeHeader}>
+            <motion.h2
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 1 }}
+            >
+              소통의 한계를 넘어 <br />
+              우리 이제 편하게 대화해요!
+            </motion.h2>
+            <motion.h4
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 2 }}
+            >
+              카메라를 키고 수어를 입력해주세요! <br />
+              수어를 텍스트로 번역해드립니다.
+            </motion.h4>
+          </header>
+          <button onClick={handleHome} type="submit" className="right-button">
+            시작하기
+          </button>
         </div>
       </motion.div>
     </motion.div>

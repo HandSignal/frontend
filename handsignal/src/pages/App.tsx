@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Login from "./Login";
 import Recognize from "./Recognize";
-import Signup from "./Signup";
 import Main from "./Main";
 import MyPage from "./Mypage";
 import Page1 from "./Page1";
@@ -15,7 +14,6 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/home" element={<Main />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/recognize" element={<Recognize />} />;
           <Route path="/mypage" element={<MyPage />} />;
           <Route path="/page1" element={<Page1 />} />
