@@ -13,7 +13,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2>정말 로그아웃 하시겠습니까?</h2>
+        <h2>초기화면으로 돌아가시겠습니까?</h2>
         <button onClick={onClose} className={styles.modalButton}>
           취소
         </button>

@@ -65,7 +65,7 @@ const Nav: React.FC = () => {
           onClick={handleLogout}
           className={`${styles.navButton} ${styles.logoutButton}`}
         >
-          로그아웃
+          초기화면
         </button>
       </div>
 
