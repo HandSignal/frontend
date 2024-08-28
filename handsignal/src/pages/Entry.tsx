@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import "../styles/Login.css";
+import "../styles/Entry.css";
 import Logo from "../assets/HS_Logo.png";
-import header_logo from "../assets/Single_HandSignal2.png";
 import styles from "../styles/Main.module.css";
 
-const Login: React.FC = () => {
+const Entry: React.FC = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -67,4 +66,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Entry;
