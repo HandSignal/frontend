@@ -10,8 +10,8 @@ const Page1: React.FC = () => {
       <Nav />
       <div className={styles.homeContainer}>
         <header className={styles.homeHeader}>
-          <h1>위급 상황에서 사용할 수 있는 수화</h1>
-          <p>아래의 수화를 통해 위급 상황에서 필요한 표현을 배워보세요.</p>
+          <h1>인사하기 수어</h1>
+          <p>아래의 수화를 통해 다양한 인사 표현을 배워보세요.</p>
         </header>
         <div className={styles.cardGrid}>
           <SignList />

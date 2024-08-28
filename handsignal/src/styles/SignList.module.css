@@ -1,33 +1,42 @@
-.sign-list {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 한 줄에 4개의 카드 */
-  gap: 1rem;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto; /* 중앙 정렬 */
+.signList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* 화면 크기에 따라 다음 줄로 넘어가도록 설정 */
+  gap: 1rem; /* 카드 간의 간격 */
   padding: 1rem;
+  justify-content: center; /* 카드들을 수평 가운데 정렬 */
 }
 
+.signCard {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 카드 내 콘텐츠를 가운데 정렬 */
+}
+
+.signVideo {
+  width: 100%;
+  max-width: 300px; /* 비디오의 최대 너비를 설정 */
+  border-radius: 8px;
+}
+
+/* 미디어 쿼리 */
 @media (max-width: 1200px) {
-  .sign-list {
-    grid-template-columns: repeat(
-      3,
-      1fr
-    ); /* 화면이 1200px 이하일 때 3개의 카드 */
+  .signCard {
+    width: calc(33.33% - 1rem); /* 화면이 좁아지면 3개씩 나열 */
   }
 }
 
 @media (max-width: 900px) {
-  .sign-list {
-    grid-template-columns: repeat(
-      2,
-      1fr
-    ); /* 화면이 900px 이하일 때 2개의 카드 */
+  .signCard {
+    width: calc(50% - 1rem); /* 화면이 더 좁아지면 2개씩 나열 */
   }
 }
 
 @media (max-width: 600px) {
-  .sign-list {
-    grid-template-columns: 1fr; /* 화면이 600px 이하일 때 1개의 카드 */
+  .signCard {
+    width: calc(100% - 1rem); /* 모바일에서는 1개씩 나열 */
   }
 }
