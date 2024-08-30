@@ -74,7 +74,7 @@ const Recognize = () => {
       });
 
       newHolistic.setOptions({
-        modelComplexity: 1,
+        modelComplexity: 0,
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5,
       });
@@ -154,8 +154,8 @@ const Recognize = () => {
               console.error("Error sending image to holistic:", error);
             }
           },
-          width: 1280,
-          height: 720,
+          width: 640,
+          height: 480,
         });
 
         cameraRef.current = camera;
