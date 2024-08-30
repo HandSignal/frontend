@@ -29,11 +29,11 @@ body {
   padding: 1rem 2rem;
   box-sizing: border-box;
   z-index: 1000;
-  transition: transform 0.3s ease;
+  transition: transform 0.6s ease;
 }
 
 .headerLogo {
-  width: 150px; /* Adjusted size for better responsiveness */
+  width: 150px;
   height: auto;
 }
 
@@ -51,7 +51,7 @@ body {
   border-radius: 10px;
   cursor: pointer;
   font-size: 20px;
-  transition: background-color 0.5s;
+  transition: background-color 0.5s, transform 0.3s ease;
   background-color: #6d4934;
   color: #fff;
 }
@@ -59,42 +59,23 @@ body {
 button:hover {
   background-color: #a67c52;
   color: #fff;
+  transform: scale(1.05);
 }
 
 @media (max-width: 1200px) {
   .cardGrid {
-    grid-template-columns: repeat(
-      3,
-      1fr
-    ); /* 화면이 1200px 이하일 때 3개의 열 */
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 900px) {
   .cardGrid {
-    grid-template-columns: repeat(2, 1fr); /* 화면이 900px 이하일 때 2개의 열 */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
   .cardGrid {
-    grid-template-columns: 1fr; /* 화면이 600px 이하일 때 1개의 열 */
+    grid-template-columns: 1fr;
   }
-}
-
-/* 페이드인 애니메이션 정의 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* homeContainer에 페이드인 효과 적용 */
-.homeContainer {
-  animation: fadeIn 1s ease-in-out;
 }
