@@ -85,6 +85,10 @@ body {
   justify-content: flex-start;
 }
 
+.active {
+  color: #ffb415; /* 활성화된 버튼의 글씨 색상 */
+}
+
 /* 토글 상태일 때 메뉴가 가운데 정렬되도록 */
 .navToggleCheckbox:checked ~ .navMenu {
   display: flex;

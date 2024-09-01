@@ -1,6 +1,5 @@
-// src/components/Nav.tsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import top_logo from "../assets/Single_HandSignal.png";
 import styles from "../styles/Nav.module.css";
 import Modal from "./LogoutModal";
@@ -8,6 +7,7 @@ import Modal from "./LogoutModal";
 const Nav: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // 현재 경로를 가져오기 위한 useLocation 훅
 
   const handleLogout = () => {
     setIsModalOpen(true);
@@ -24,6 +24,13 @@ const Nav: React.FC = () => {
 
   const handleClick = () => {
     navigate("/home");
+  };
+
+  // 현재 경로에 따라 동적으로 스타일을 적용할 수 있도록 helper 함수를 만듭니다.
+  const getButtonClass = (path: string) => {
+    return location.pathname === path
+      ? `${styles.navButton} ${styles.active}`
+      : `${styles.navButton}`;
   };
 
   return (
@@ -45,13 +52,13 @@ const Nav: React.FC = () => {
         />
         <button
           onClick={() => navigate("/recognize")}
-          className={styles.navButton}
+          className={getButtonClass("/recognize")}
         >
           수화 번역기
         </button>
         <button
           onClick={() => navigate("/videocalentry")}
-          className={styles.navButton}
+          className={getButtonClass("/videocalentry")}
         >
           수화 통화
         </button>
