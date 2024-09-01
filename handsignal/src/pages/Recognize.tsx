@@ -5,6 +5,7 @@ import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
+import axios from "axios";
 
 interface Keypoint {
   x: number;
@@ -246,23 +247,51 @@ const Recognize = () => {
     });
   };
 
-  const saveDataToJson = () => {
+  const saveDataToServer = async () => {
+    if (!recordedData.pose_keypoints.length) {
+      console.warn("저장할 데이터가 없습니다.");
+      alert("저장할 데이터가 없습니다.");
+      return;
+    }
+
     const formattedData = {
       pose_keypoint: recordedData.pose_keypoints,
       left_hand_keypoint: recordedData.left_hand_keypoints,
       right_hand_keypoint: recordedData.right_hand_keypoints,
     };
 
-    const jsonData = JSON.stringify(formattedData, null, 2);
-    const blob = new Blob([jsonData], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recorded_data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([JSON.stringify(formattedData, null, 2)], {
+        type: "application/json",
+      }),
+      "recorded_data.json"
+    );
+
+    try {
+      console.log("서버로 데이터 전송 시작");
+      const response = await axios.post(
+        "http://43.203.16.219:5000/files/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("데이터가 성공적으로 저장되었습니다.");
+        alert("데이터가 성공적으로 저장되었습니다.");
+      } else {
+        console.log("데이터 저장에 실패했습니다. 상태 코드:", response.status);
+        alert("데이터 저장에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("데이터 전송 중 오류 발생:", error);
+      alert("데이터 저장 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -295,7 +324,7 @@ const Recognize = () => {
           </button>
           <button
             className="button"
-            onClick={saveDataToJson}
+            onClick={saveDataToServer}
             disabled={!recordedData.pose_keypoints.length}
           >
             데이터 저장
