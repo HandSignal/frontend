@@ -1,4 +1,3 @@
-/* 전체 컨테이너 */
 .container {
   display: flex;
   flex-direction: column;
@@ -10,26 +9,44 @@
   background-color: #f2f2f2;
 }
 
-/* 제목 스타일 */
 .title {
-  font-size: 32px;
+  font-size: 24px;
   margin-bottom: 20px;
-  color: #333;
-  text-align: center;
 }
 
-/* 입력 필드와 버튼을 포함한 컨테이너 */
+.videoContainer {
+  display: flex;
+  justify-content: center;
+  width: 480px;
+  height: 350px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  border: 4px solid #f6cf7a;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  object-fit: cover;
+}
+
+.videoDisabled {
+  background-color: #000;
+  border: 4px solid #000;
+  border-radius: 12px;
+}
+
 .controls {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-  max-width: 500px;
 }
 
-/* 입력 필드 스타일링 */
 .inputField {
-  width: 100%;
+  width: 80%;
+  max-width: 400px;
   padding: 12px;
   margin: 10px 0;
   border-radius: 8px;
@@ -39,23 +56,11 @@
   box-sizing: border-box;
 }
 
-/* 체크박스 스타일링 */
-label {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-  margin: 10px 0;
-}
-
-label input[type="checkbox"] {
-  margin-right: 8px;
-}
-
-/* 버튼 스타일링 */
 .button {
-  width: 100%;
+  width: 80%;
+  max-width: 400px;
   padding: 12px;
-  margin-top: 20px;
+  margin: 10px 0;
   border: none;
   border-radius: 8px;
   background-color: #f6cf7a;
@@ -68,4 +73,15 @@ label input[type="checkbox"] {
 .button:hover {
   background-color: #e0b75c;
   transform: scale(1.05);
+}
+
+.error {
+  color: #dc3545;
+  font-size: 20px;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  text-align: center;
 }
