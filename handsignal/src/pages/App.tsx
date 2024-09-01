@@ -5,6 +5,7 @@ import Entry from "./Entry";
 import Recognize from "./Recognize";
 import Main from "./Main";
 import VideoCall from "./VideoCall";
+import VideoCallEntry from "./VideoCallEntry";
 import Page1 from "./Page1";
 import Page2 from "./Page2";
 import Page3 from "./Page3";
@@ -18,7 +19,8 @@ const App: React.FC = () => {
           <Route path="/" element={<Entry />} />
           <Route path="/home" element={<Main />} />
           <Route path="/recognize" element={<Recognize />} />;
-          <Route path="/VideoCall" element={<VideoCall />} />;
+          <Route path="/Videocall" element={<VideoCall />} />;
+          <Route path="/videocalentry" element={<VideoCallEntry />} />;
           <Route path="/page1" element={<Page1 />} />
           <Route path="/page2" element={<Page2 />} />
           <Route path="/page3" element={<Page3 />} />
