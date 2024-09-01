@@ -18,7 +18,6 @@ const App: React.FC = () => {
           <Route path="/" element={<Entry />} />
           <Route path="/home" element={<Main />} />
           <Route path="/recognize" element={<Recognize />} />;
-          <Route path="/mypage" element={<MyPage />} />;
           <Route path="/page1" element={<Page1 />} />
           <Route path="/page2" element={<Page2 />} />
           <Route path="/page3" element={<Page3 />} />
