@@ -1,29 +1,42 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "../styles/VideoCallEntry.module.css"; // CSS 모듈 가져오기
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faMicrophone,
+  faMicrophoneSlash,
+  faVideo,
+  faVideoSlash,
+} from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import styles from "../styles/VideoCallEntry.module.css";
 import Nav from "./Nav";
 
 const VideoCallEntry: React.FC = () => {
-  const [name, setName] = useState(""); // 사용자 이름
-  const [audioEnabled, setAudioEnabled] = useState(true); // 마이크 상태
-  const [videoEnabled, setVideoEnabled] = useState(true); // 카메라 상태
-  const [stream, setStream] = useState<MediaStream | null>(null); // 미디어 스트림
-  const [error, setError] = useState<string | null>(null); // 오류 상태
-  const myVideo = useRef<HTMLVideoElement | null>(null); // 비디오 요소 참조
-  const navigate = useNavigate(); // 페이지 이동을 위한 훅
+  const [name, setName] = useState("");
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [videoEnabled, setVideoEnabled] = useState(true);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [roomId, setRoomId] = useState("");
+  const myVideo = useRef<HTMLVideoElement | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getMediaStream = async () => {
       try {
-        if (audioEnabled || videoEnabled) {
-          const mediaStream = await navigator.mediaDevices.getUserMedia({
-            video: videoEnabled,
-            audio: audioEnabled,
-          });
-          setStream(mediaStream);
-          if (myVideo.current) {
-            myVideo.current.srcObject = mediaStream;
-          }
+        if (!videoEnabled && !audioEnabled) {
+          return;
+        }
+
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: videoEnabled,
+          audio: audioEnabled,
+        });
+
+        setStream(mediaStream);
+
+        if (myVideo.current) {
+          myVideo.current.srcObject = mediaStream;
         }
       } catch (err) {
         console.error("미디어 장치 접근 오류.", err);
@@ -43,7 +56,6 @@ const VideoCallEntry: React.FC = () => {
 
     getMediaStream();
 
-    // Cleanup on component unmount
     return () => {
       if (myVideo.current) {
         myVideo.current.srcObject = null;
@@ -59,30 +71,50 @@ const VideoCallEntry: React.FC = () => {
     }
   }, [videoEnabled, stream]);
 
-  const handleJoin = () => {
+  const handleCreateRoom = async () => {
     if (name.trim() === "") {
       alert("이름을 입력해 주세요.");
       return;
     }
-    navigate("/videocall", {
-      state: { name, audioEnabled, videoEnabled },
-    }); // 화상통화 방으로 이동
+    try {
+      const response = await axios.post("/api/rooms");
+      const newRoomId = response.data.roomId;
+      navigate(
+        `/video-calls/room/entry/${newRoomId}?name=${encodeURIComponent(name)}`
+      );
+    } catch (err) {
+      console.error("방 생성 오류", err);
+      setError("방 생성 오류가 발생했습니다.");
+    }
+  };
+
+  const handleJoinRoom = async () => {
+    if (name.trim() === "" || !roomId.trim()) {
+      alert("이름과 방 ID를 입력해 주세요.");
+      return;
+    }
+    try {
+      await axios.post(`/api/rooms/${roomId}/join`, { name });
+      navigate(
+        `/video-calls/room/entry/${roomId}?name=${encodeURIComponent(name)}`
+      );
+    } catch (err) {
+      console.error("방 입장 오류", err);
+      setError("방 입장 오류가 발생했습니다.");
+    }
   };
 
   return (
     <>
-      <Nav />
       <div className={styles.container}>
-        <h1 className={styles.title}>입장 방</h1>
+        <Nav />
         <div className={styles.controls}>
           <div className={styles.videoContainer}>
             <video
               ref={myVideo}
               autoPlay
               playsInline
-              className={`${styles.video} ${
-                !videoEnabled ? styles.videoDisabled : ""
-              }`}
+              className={videoEnabled ? styles.video : styles.videoDisabled}
             />
           </div>
           <input
@@ -92,29 +124,50 @@ const VideoCallEntry: React.FC = () => {
             placeholder="사용자 이름을 입력하세요"
             className={styles.inputField}
           />
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={audioEnabled}
-                onChange={() => setAudioEnabled(!audioEnabled)}
+          <input
+            type="text"
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
+            placeholder="방 ID 입력 (기존 방 입장)"
+            className={styles.inputField}
+          />
+          <div className={styles.iconControls}>
+            <div
+              onClick={() => setAudioEnabled(!audioEnabled)}
+              className={styles.icon}
+            >
+              <FontAwesomeIcon
+                icon={audioEnabled ? faMicrophone : faMicrophoneSlash}
+                size="2x"
+                color={audioEnabled ? "#4CAF50" : "#f44336"}
               />
-              마이크 {audioEnabled ? "켜기" : "끄기"}
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={videoEnabled}
-                onChange={() => setVideoEnabled(!videoEnabled)}
+              <span className={styles.iconText}>
+                {audioEnabled ? "마이크 켜기" : "마이크 끄기"}
+              </span>
+            </div>
+            <div
+              onClick={() => setVideoEnabled(!videoEnabled)}
+              className={styles.icon}
+            >
+              <FontAwesomeIcon
+                icon={videoEnabled ? faVideo : faVideoSlash}
+                size="2x"
+                color={videoEnabled ? "#4CAF50" : "#f44336"}
               />
-              카메라 {videoEnabled ? "켜기" : "끄기"}
-            </label>
+              <span className={styles.iconText}>
+                {videoEnabled ? "카메라 켜기" : "카메라 끄기"}
+              </span>
+            </div>
           </div>
-          <button onClick={handleJoin} className={styles.button}>
-            입장
-          </button>
+          <div className={styles.buttonContainer}>
+            <button onClick={handleCreateRoom} className={styles.button}>
+              방 생성
+            </button>
+            <button onClick={handleJoinRoom} className={styles.button}>
+              방 입장
+            </button>
+          </div>
         </div>
-
         {error && <p className={styles.error}>{error}</p>}
       </div>
     </>
