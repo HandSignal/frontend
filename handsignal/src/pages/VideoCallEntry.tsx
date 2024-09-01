@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // React Router DOM을 사용하여 페이지 이동
-import "../styles/VideoCall.module.css"; // CSS 파일 가져오기
-import styles from "../styles/VideoCall.module.css"; // CSS 모듈 가져오기
+import { useNavigate } from "react-router-dom";
+import styles from "../styles/VideoCallEntry.module.css"; // CSS 모듈 가져오기
+import Nav from "./Nav";
 
 const VideoCallEntry: React.FC = () => {
   const [name, setName] = useState(""); // 사용자 이름
@@ -20,39 +20,42 @@ const VideoCallEntry: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>입장 방</h1>
-      <div className={styles.controls}>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="사용자 이름을 입력하세요"
-          className={styles.inputField}
-        />
-        <div>
-          <label>
-            <input
-              type="checkbox"
-              checked={audioEnabled}
-              onChange={() => setAudioEnabled(!audioEnabled)}
-            />
-            마이크 {audioEnabled ? "켜기" : "끄기"}
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={videoEnabled}
-              onChange={() => setVideoEnabled(!videoEnabled)}
-            />
-            카메라 {videoEnabled ? "켜기" : "끄기"}
-          </label>
+    <>
+      <Nav />
+      <div className={styles.container}>
+        <h1 className={styles.title}>입장 방</h1>
+        <div className={styles.controls}>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="사용자 이름을 입력하세요"
+            className={styles.inputField}
+          />
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={audioEnabled}
+                onChange={() => setAudioEnabled(!audioEnabled)}
+              />
+              마이크 {audioEnabled ? "켜기" : "끄기"}
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={videoEnabled}
+                onChange={() => setVideoEnabled(!videoEnabled)}
+              />
+              카메라 {videoEnabled ? "켜기" : "끄기"}
+            </label>
+          </div>
+          <button onClick={handleJoin} className={styles.button}>
+            입장
+          </button>
         </div>
-        <button onClick={handleJoin} className={styles.button}>
-          입장
-        </button>
       </div>
-    </div>
+    </>
   );
 };
 

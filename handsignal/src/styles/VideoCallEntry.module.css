@@ -1,0 +1,71 @@
+/* 전체 컨테이너 */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #f2f2f2;
+}
+
+/* 제목 스타일 */
+.title {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+/* 입력 필드와 버튼을 포함한 컨테이너 */
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* 입력 필드 스타일링 */
+.inputField {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #f6cf7a;
+  font-size: 16px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+/* 체크박스 스타일링 */
+label {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+label input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* 버튼 스타일링 */
+.button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f6cf7a;
+  color: #333;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.button:hover {
+  background-color: #e0b75c;
+  transform: scale(1.05);
+}
