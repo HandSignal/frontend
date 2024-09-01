@@ -50,7 +50,7 @@ const Nav: React.FC = () => {
           수화 번역기
         </button>
         <button
-          onClick={() => navigate("/section2")}
+          onClick={() => navigate("/videocall")}
           className={styles.navButton}
         >
           수화 통화
