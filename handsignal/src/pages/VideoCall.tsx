@@ -1,29 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import SimplePeer from "simple-peer";
-import socket from "../utils/socket"; // socket.ts에서 가져오기
+import { useLocation, useNavigate } from "react-router-dom"; // React Router DOM을 사용하여 페이지 이동
 import "../styles/VideoCall.module.css"; // CSS 파일 가져오기
-import Nav from "./Nav";
 import styles from "../styles/VideoCall.module.css"; // CSS 모듈 가져오기
+import Nav from "./Nav";
 
 const VideoCall: React.FC = () => {
-  const [me, setMe] = useState<string>("");
   const [stream, setStream] = useState<MediaStream | null>(null);
-  const [receivingCall, setReceivingCall] = useState(false);
-  const [caller, setCaller] = useState("");
-  const [callerSignal, setCallerSignal] = useState<any>(null);
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [idToCall, setIdToCall] = useState("");
-  const [name, setName] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   const myVideo = useRef<HTMLVideoElement>(null);
   const userVideo = useRef<HTMLVideoElement>(null);
   const connectionRef = useRef<SimplePeer.Instance | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // location.state가 null일 경우 기본값 설정
+  const {
+    name = "사용자",
+    audioEnabled = true,
+    videoEnabled = true,
+  } = location.state || {};
 
   useEffect(() => {
     navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+      .getUserMedia({ video: videoEnabled, audio: audioEnabled })
       .then((stream) => {
         setStream(stream);
         if (myVideo.current) {
@@ -31,94 +34,20 @@ const VideoCall: React.FC = () => {
         }
       })
       .catch((error) => {
-        console.error("Error accessing media devices.", error);
-        setError(
-          "Failed to access camera and microphone. Please check your permissions."
-        );
+        console.error("미디어 장치 접근 오류.", error);
+        alert("카메라와 마이크에 접근할 수 없습니다. 권한을 확인해 주세요.");
       });
 
-    socket.on("me", (id: string) => {
-      setMe(id);
-    });
-
-    socket.on(
-      "callUser",
-      (data: { from: string; name: string; signal: any }) => {
-        setReceivingCall(true);
-        setCaller(data.from);
-        setName(data.name);
-        setCallerSignal(data.signal);
-      }
-    );
-
+    // Cleanup on component unmount
     return () => {
-      socket.off("callUser");
-      socket.off("me");
+      if (myVideo.current) {
+        myVideo.current.srcObject = null;
+      }
+      if (userVideo.current) {
+        userVideo.current.srcObject = null;
+      }
     };
-  }, []);
-
-  const callUser = (id: string) => {
-    const peer = new SimplePeer({
-      initiator: true,
-      trickle: false,
-      stream: stream!,
-    });
-
-    peer.on("signal", (data) => {
-      socket.emit("callUser", {
-        userToCall: id,
-        signalData: data,
-        from: me,
-        name: name,
-      });
-    });
-
-    peer.on("stream", (stream) => {
-      if (userVideo.current) {
-        userVideo.current.srcObject = stream;
-      }
-    });
-
-    socket.on("callAccepted", (signal) => {
-      setCallAccepted(true);
-      peer.signal(signal);
-    });
-
-    connectionRef.current = peer;
-  };
-
-  const answerCall = () => {
-    setCallAccepted(true);
-    const peer = new SimplePeer({
-      initiator: false,
-      trickle: false,
-      stream: stream!,
-    });
-
-    peer.on("signal", (data) => {
-      socket.emit("answerCall", { signal: data, to: caller });
-    });
-
-    peer.on("stream", (stream) => {
-      if (userVideo.current) {
-        userVideo.current.srcObject = stream;
-      }
-    });
-
-    peer.signal(callerSignal);
-    connectionRef.current = peer;
-  };
-
-  const leaveCall = () => {
-    setCallEnded(true);
-    if (myVideo.current) {
-      myVideo.current.srcObject = null;
-    }
-    if (userVideo.current) {
-      userVideo.current.srcObject = null;
-    }
-    connectionRef.current?.destroy();
-  };
+  }, [audioEnabled, videoEnabled]);
 
   const toggleAudio = () => {
     if (stream) {
@@ -134,11 +63,22 @@ const VideoCall: React.FC = () => {
     }
   };
 
+  const leaveCall = () => {
+    setCallEnded(true);
+    if (myVideo.current) {
+      myVideo.current.srcObject = null;
+    }
+    if (userVideo.current) {
+      userVideo.current.srcObject = null;
+    }
+    connectionRef.current?.destroy();
+    navigate("/"); // 홈으로 이동
+  };
+
   return (
     <>
       <Nav />
       <div className={styles.container}>
-        {error && <div className={styles.error}>{error}</div>}
         <div className={styles.videoContainer}>
           {stream && (
             <video
@@ -161,50 +101,41 @@ const VideoCall: React.FC = () => {
         <div className={styles.controls}>
           <input
             type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Your Name"
-            className={styles.inputField}
-          />
-          <input
-            type="text"
             value={idToCall}
             onChange={(e) => setIdToCall(e.target.value)}
-            placeholder="ID to Call"
+            placeholder="전화할 ID를 입력하세요"
             className={styles.inputField}
           />
           <div>
             {callAccepted && !callEnded ? (
               <>
                 <button onClick={leaveCall} className={styles.button}>
-                  Hang Up
+                  통화 종료
                 </button>
                 <button onClick={toggleAudio} className={styles.button}>
-                  Toggle Audio
+                  마이크{" "}
+                  {stream && stream.getAudioTracks()[0]?.enabled
+                    ? "끄기"
+                    : "켜기"}
                 </button>
                 <button onClick={toggleVideo} className={styles.button}>
-                  Toggle Video
+                  카메라{" "}
+                  {stream && stream.getVideoTracks()[0]?.enabled
+                    ? "끄기"
+                    : "켜기"}
                 </button>
               </>
             ) : (
               <button
-                onClick={() => callUser(idToCall)}
+                onClick={() => console.log(`Call ${idToCall}`)} // Placeholder action
                 className={styles.button}
               >
-                Call
+                전화 걸기
               </button>
             )}
           </div>
         </div>
-        {receivingCall && !callAccepted ? (
-          <div>
-            <h1 className={styles.callingText}>{name} is calling...</h1>
-            <button onClick={answerCall} className={styles.button}>
-              Answer
-            </button>
-          </div>
-        ) : null}
-        <p>Your ID: {me}</p>
+        <p>사용자 이름: {name}</p>
       </div>
     </>
   );
