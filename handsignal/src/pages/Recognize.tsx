@@ -6,12 +6,11 @@ import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
 
-// 타입 정의
 interface Keypoint {
   x: number;
   y: number;
   z: number;
-  visibility: number;
+  visibility?: number;
 }
 
 interface FrameData {
@@ -37,13 +36,11 @@ const Recognize = () => {
   );
   const [isCameraOn, setIsCameraOn] = useState(false);
 
-  // 카운트다운 및 녹화 상태 관련 상태 변수
   const [countdown, setCountdown] = useState<number>(0);
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
-  // 카메라 권한 요청 및 상태 관리
   useEffect(() => {
     const requestCameraPermission = async () => {
       try {
@@ -52,7 +49,7 @@ const Recognize = () => {
         });
         if (stream) {
           setCameraPermission(true);
-          stream.getTracks().forEach((track) => track.stop()); // 테스트 후 스트림 중지
+          stream.getTracks().forEach((track) => track.stop());
         } else {
           setCameraPermission(false);
         }
@@ -65,7 +62,6 @@ const Recognize = () => {
     requestCameraPermission();
   }, []);
 
-  // Mediapipe Holistic 객체 초기화
   useEffect(() => {
     if (cameraPermission === true && holistic === null) {
       const newHolistic = new Holistic({
@@ -103,23 +99,21 @@ const Recognize = () => {
           x: point.x,
           y: point.y,
           z: point.z,
-          visibility: point.visibility ?? 0, // Handle undefined with default value
+          visibility: point.visibility ?? 0,
         })) || [];
 
-      const leftHandKeypoints: Keypoint[] =
+      const leftHandKeypoints =
         results.leftHandLandmarks?.map((point) => ({
           x: point.x,
           y: point.y,
           z: point.z,
-          visibility: point.visibility ?? 0, // Handle undefined with default value
         })) || [];
 
-      const rightHandKeypoints: Keypoint[] =
+      const rightHandKeypoints =
         results.rightHandLandmarks?.map((point) => ({
           x: point.x,
           y: point.y,
           z: point.z,
-          visibility: point.visibility ?? 0, // Handle undefined with default value
         })) || [];
 
       if (isRecording) {
@@ -139,7 +133,6 @@ const Recognize = () => {
     [isRecording]
   );
 
-  // 웹캠 및 Mediapipe Holistic 모델과 Camera 객체 연동
   useEffect(() => {
     if (cameraPermission === true && holistic && webcamRef.current) {
       const video = webcamRef.current.video;
@@ -176,7 +169,6 @@ const Recognize = () => {
     }
   }, [holistic, onResults, cameraPermission, isCameraOn]);
 
-  // 녹화 시작/중지 토글 함수
   const toggleRecording = () => {
     if (!isCameraOn) {
       alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
@@ -184,7 +176,6 @@ const Recognize = () => {
     }
 
     if (isCountdownActive) {
-      // 카운트다운이 진행 중일 때 녹화 중지 버튼을 누르면 카운트다운을 중지하고 녹화도 중지합니다.
       setIsCountdownActive(false);
       setCountdown(0);
       setIsRecording(false);
@@ -193,11 +184,9 @@ const Recognize = () => {
     }
 
     if (isRecording) {
-      // 이미 녹화 중인 경우 녹화 중지
       setIsRecording(false);
       setIsRecordingIndicatorVisible(false);
     } else {
-      // 녹화를 시작하는 경우
       setIsCountdownActive(true);
       setCountdown(3);
       setIsRecordingIndicatorVisible(true);
@@ -221,7 +210,6 @@ const Recognize = () => {
     }
   };
 
-  // 카메라 기능 토글 함수
   const toggleCamera = () => {
     setIsCameraOn((prev) => {
       const newStatus = !prev;
