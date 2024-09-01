@@ -20,7 +20,7 @@ const App: React.FC = () => {
           <Route path="/home" element={<Main />} />
           <Route path="/recognize" element={<Recognize />} />;
           <Route path="/Videocall" element={<VideoCall />} />;
-          <Route path="/videocalentry" element={<VideoCallEntry />} />;
+          <Route path="/videocall-entry" element={<VideoCallEntry />} />;
           <Route path="/page1" element={<Page1 />} />
           <Route path="/page2" element={<Page2 />} />
           <Route path="/page3" element={<Page3 />} />

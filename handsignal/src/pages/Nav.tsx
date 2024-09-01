@@ -57,8 +57,8 @@ const Nav: React.FC = () => {
           수화 번역기
         </button>
         <button
-          onClick={() => navigate("/videocalentry")}
-          className={getButtonClass("/videocalentry")}
+          onClick={() => navigate("/videocall-entry")}
+          className={getButtonClass("/videocall-entry")}
         >
           수화 통화
         </button>
