@@ -148,8 +148,8 @@ const Recognize = () => {
               console.error("Error sending image to holistic:", error);
             }
           },
-          width: 640,
-          height: 480,
+          width: 1280,
+          height: 720,
         });
 
         cameraRef.current = camera;
@@ -227,8 +227,8 @@ const Recognize = () => {
                 console.error("Error sending image to holistic:", error);
               }
             },
-            width: 1280,
-            height: 720,
+            width: 1920,
+            height: 1080,
           });
           cameraRef.current = camera;
           camera.start();
@@ -301,11 +301,15 @@ const Recognize = () => {
         <Webcam
           audio={false}
           style={{ visibility: "hidden" }}
-          width={1280}
-          height={700}
+          width={1920}
+          height={1080}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
-          videoConstraints={{ facingMode: "user" }}
+          videoConstraints={{
+            width: 1920,
+            height: 1080,
+            facingMode: "user",
+          }}
         />
         <div className="buttonContainer">
           <button
@@ -330,7 +334,7 @@ const Recognize = () => {
             데이터 저장
           </button>
         </div>
-        <canvas ref={canvasRef} className="canvas" width={1280} height={720} />
+        <canvas ref={canvasRef} className="canvas" width={1920} height={1080} />
         {isCountdownActive && <div className="countdown">{countdown}</div>}
         {isRecordingIndicatorVisible && (
           <div className="recording-indicator">녹화 중</div>
