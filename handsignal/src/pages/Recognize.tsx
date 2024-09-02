@@ -214,35 +214,34 @@ const Recognize = () => {
   const toggleCamera = () => {
     setIsCameraOn((prev) => {
       const newStatus = !prev;
+
       if (newStatus && webcamRef.current) {
         const video = webcamRef.current.video;
         if (video) {
-          const camera = new Camera(video, {
-            onFrame: async () => {
-              try {
-                if (holistic) {
-                  await holistic.send({ image: video });
+          if (!cameraRef.current) {
+            const camera = new Camera(video, {
+              onFrame: async () => {
+                try {
+                  if (holistic) {
+                    await holistic.send({ image: video });
+                  }
+                } catch (error) {
+                  console.error("Error sending image to holistic:", error);
                 }
-              } catch (error) {
-                console.error("Error sending image to holistic:", error);
-              }
-            },
-            width: 1920,
-            height: 1080,
-          });
-          cameraRef.current = camera;
-          camera.start();
-          setHolistic((prevHolistic) => {
-            if (prevHolistic) {
-              prevHolistic.onResults(onResults);
-            }
-            return prevHolistic;
-          });
+              },
+              width: 1920,
+              height: 1080,
+            });
+            cameraRef.current = camera;
+            camera.start();
+          } else {
+            cameraRef.current.start();
+          }
         }
       } else if (cameraRef.current) {
         cameraRef.current.stop();
-        cameraRef.current = null;
       }
+
       return newStatus;
     });
   };
