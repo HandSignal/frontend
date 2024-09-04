@@ -190,14 +190,14 @@ const Recognize = () => {
     } else {
       setIsCountdownActive(true);
       setCountdown(3);
-      setIsRecordingIndicatorVisible(true);
+      setIsRecordingIndicatorVisible(false); // 카운트다운 중에는 표시하지 않음
 
       const countdownInterval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(countdownInterval);
             setIsRecording(true);
-            setIsRecordingIndicatorVisible(false);
+            setIsRecordingIndicatorVisible(true); // 카운트다운 종료 후 녹화 시작
             setRecordedData({
               pose_keypoints: [],
               left_hand_keypoints: [],
@@ -297,19 +297,28 @@ const Recognize = () => {
     <>
       <Nav />
       <div className="container">
-        <Webcam
-          audio={false}
-          style={{ visibility: "hidden" }}
-          width={1920}
-          height={1080}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={{
-            width: 1920,
-            height: 1080,
-            facingMode: "user",
-          }}
-        />
+        <div className="webcam-container">
+          <canvas ref={canvasRef} className="canvas" width={720} height={480} />
+          <Webcam
+            audio={false}
+            style={{ visibility: "hidden" }}
+            width={720}
+            height={480}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            videoConstraints={{
+              width: 720,
+              height: 480,
+              facingMode: "user",
+            }}
+          />
+          {isCountdownActive && <div className="countdown">{countdown}</div>}
+          {!isCountdownActive && isRecordingIndicatorVisible && (
+            <div className="recording-indicator">녹화 중</div>
+          )}
+        </div>
+
+        {/* 버튼들을 webcam-container 바로 아래에 위치시키기 위한 div */}
         <div className="buttonContainer">
           <button
             className="button"
@@ -333,11 +342,6 @@ const Recognize = () => {
             데이터 저장
           </button>
         </div>
-        <canvas ref={canvasRef} className="canvas" width={1920} height={1080} />
-        {isCountdownActive && <div className="countdown">{countdown}</div>}
-        {isRecordingIndicatorVisible && (
-          <div className="recording-indicator">녹화 중</div>
-        )}
       </div>
     </>
   );
