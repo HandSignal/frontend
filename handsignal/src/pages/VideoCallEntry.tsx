@@ -17,8 +17,9 @@ const VideoCallEntry: React.FC = () => {
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [roomId, setRoomId] = useState<string | null>(null); // 방 ID를 선택적으로 다룸
+  const [roomId, setRoomId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const myVideo = useRef<HTMLVideoElement | null>(null);
   const navigate = useNavigate();
 
@@ -34,8 +35,9 @@ const VideoCallEntry: React.FC = () => {
         });
 
         setStream(mediaStream);
-        if (myVideo.current) {
-          myVideo.current.srcObject = mediaStream;
+        const videoElement = myVideo.current;
+        if (videoElement) {
+          videoElement.srcObject = mediaStream;
         }
       } catch (err) {
         if (err instanceof Error) {
@@ -52,8 +54,9 @@ const VideoCallEntry: React.FC = () => {
     getMediaStream();
 
     return () => {
-      if (myVideo.current) {
-        myVideo.current.srcObject = null;
+      const videoElement = myVideo.current;
+      if (videoElement) {
+        videoElement.srcObject = null;
       }
       stream?.getTracks().forEach((track) => track.stop());
     };
@@ -63,6 +66,11 @@ const VideoCallEntry: React.FC = () => {
     if (stream) {
       const videoTracks = stream.getVideoTracks();
       videoTracks.forEach((track) => (track.enabled = videoEnabled));
+
+      // Ensure video track is re-initialized if toggled
+      if (myVideo.current) {
+        myVideo.current.srcObject = stream;
+      }
     }
   }, [videoEnabled, stream]);
 
@@ -82,6 +90,14 @@ const VideoCallEntry: React.FC = () => {
     if (type === "video") setVideoEnabled(!videoEnabled);
   };
 
+  const generateRoomId = (): string => {
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  };
+
   const handleCreateRoom = async () => {
     if (name.trim() === "") {
       alert("사용자 이름을 입력해 주세요.");
@@ -91,19 +107,11 @@ const VideoCallEntry: React.FC = () => {
     try {
       let createdRoomId: string;
 
-      if (roomId) {
-        // 사용자가 방 ID를 제공한 경우
-        createdRoomId = roomId;
+      if (roomId && roomId.trim()) {
+        createdRoomId = roomId.trim(); // Use the provided roomId
       } else {
-        // 방 ID가 없는 경우, 자동으로 방을 생성
-        const response = await axios.post(
-          "http://43.203.16.219:8080/video-calls/room/create"
-        );
-        createdRoomId = response.data.roomId;
+        createdRoomId = generateRoomId(); // Generate a random roomId
       }
-
-      // Path Variable에 createdRoomId, Query String에 name을 포함한 POST 요청
-      console.log(`Joining room ${createdRoomId} with name ${name}.`);
 
       await axios.post(
         `http://43.203.16.219:8080/video-calls/room/entry/${createdRoomId}?name=${encodeURIComponent(
@@ -111,7 +119,6 @@ const VideoCallEntry: React.FC = () => {
         )}`
       );
 
-      // 방으로 이동
       navigate(
         `/video-calls/room/entry/${createdRoomId}?name=${encodeURIComponent(
           name
@@ -124,19 +131,17 @@ const VideoCallEntry: React.FC = () => {
   };
 
   const handleJoinRoom = async () => {
-    if (name.trim() === "" || roomId?.trim() === "") {
-      alert("이름과 방 ID를 입력해 주세요.");
+    if (name.trim() === "" || !roomId?.trim()) {
+      setModalVisible(true);
       return;
     }
     try {
-      // 방 입장 API 호출
       await axios.post(
         `http://43.203.16.219:8080/video-calls/room/entry/${roomId}?name=${encodeURIComponent(
           name
         )}`
       );
 
-      // 방으로 이동
       navigate(
         `/video-calls/room/entry/${roomId}?name=${encodeURIComponent(name)}`
       );
@@ -144,6 +149,10 @@ const VideoCallEntry: React.FC = () => {
       console.error("방 입장 오류", err);
       setError("방 입장 오류가 발생했습니다.");
     }
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   return (
@@ -209,6 +218,12 @@ const VideoCallEntry: React.FC = () => {
           </div>
         </div>
         {error && <p className={styles.error}>{error}</p>}
+        {modalVisible && (
+          <div className={styles.modal}>
+            <p>방 ID를 입력해 주세요.</p>
+            <button onClick={closeModal}>확인</button>
+          </div>
+        )}
       </div>
     </>
   );
