@@ -1,159 +1,165 @@
-import React, { useEffect, useRef, useState } from "react";
-import SimplePeer from "simple-peer";
-import { useLocation, useNavigate } from "react-router-dom";
-import styles from "../styles/VideoCall.module.css";
-import Nav from "./Nav";
+import { useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+import { io, Socket } from "socket.io-client";
 
-const VideoCall: React.FC = () => {
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [callAccepted, setCallAccepted] = useState(false);
-  const [callEnded, setCallEnded] = useState(false);
-  const [idToCall, setIdToCall] = useState("");
-  const [peer, setPeer] = useState<SimplePeer.Instance | null>(null);
+const VideoCall = () => {
+  const socketRef = useRef<Socket>();
+  const myVideoRef = useRef<HTMLVideoElement>(null);
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  const pcRef = useRef<RTCPeerConnection>();
 
-  const myVideo = useRef<HTMLVideoElement>(null);
-  const userVideo = useRef<HTMLVideoElement>(null);
-  const connectionRef = useRef<SimplePeer.Instance | null>(null);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { roomName } = useParams();
 
-  const {
-    name = "사용자",
-    audioEnabled = true,
-    videoEnabled = true,
-  } = location.state || {};
-
-  useEffect(() => {
-    navigator.mediaDevices
-      .getUserMedia({ video: videoEnabled, audio: audioEnabled })
-      .then((stream) => {
-        setStream(stream);
-        if (myVideo.current) {
-          myVideo.current.srcObject = stream;
-        }
-      })
-      .catch((error) => {
-        console.error("미디어 장치 접근 오류.", error);
-        alert("카메라와 마이크에 접근할 수 없습니다. 권한을 확인해 주세요.");
+  const getMedia = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
       });
 
+      if (myVideoRef.current) {
+        myVideoRef.current.srcObject = stream;
+      }
+      if (!(pcRef.current && socketRef.current)) {
+        return;
+      }
+      stream.getTracks().forEach((track) => {
+        if (!pcRef.current) {
+          return;
+        }
+        pcRef.current.addTrack(track, stream);
+      });
+
+      pcRef.current.onicecandidate = (e) => {
+        if (e.candidate) {
+          if (!socketRef.current) {
+            return;
+          }
+          console.log("recv candidate");
+          socketRef.current.emit("candidate", e.candidate, roomName);
+        }
+      };
+
+      pcRef.current.ontrack = (e) => {
+        if (remoteVideoRef.current) {
+          remoteVideoRef.current.srcObject = e.streams[0];
+        }
+      };
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const createOffer = async () => {
+    console.log("create Offer");
+    if (!(pcRef.current && socketRef.current)) {
+      return;
+    }
+    try {
+      const sdp = await pcRef.current.createOffer();
+      pcRef.current.setLocalDescription(sdp);
+      console.log("sent the offer");
+      socketRef.current.emit("offer", sdp, roomName);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const createAnswer = async (sdp: RTCSessionDescription) => {
+    console.log("createAnswer");
+    if (!(pcRef.current && socketRef.current)) {
+      return;
+    }
+
+    try {
+      pcRef.current.setRemoteDescription(sdp);
+      const answerSdp = await pcRef.current.createAnswer();
+      pcRef.current.setLocalDescription(answerSdp);
+
+      console.log("sent the answer");
+      socketRef.current.emit("answer", answerSdp, roomName);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    socketRef.current = io("localhost:8080");
+
+    pcRef.current = new RTCPeerConnection({
+      iceServers: [
+        {
+          urls: "stun:stun.l.google.com:19302",
+        },
+      ],
+    });
+
+    socketRef.current.on("all_users", (allUsers: Array<{ id: string }>) => {
+      if (allUsers.length > 0) {
+        createOffer();
+      }
+    });
+
+    socketRef.current.on("getOffer", (sdp: RTCSessionDescription) => {
+      console.log("recv Offer");
+      createAnswer(sdp);
+    });
+
+    socketRef.current.on("getAnswer", (sdp: RTCSessionDescription) => {
+      console.log("recv Answer");
+      if (!pcRef.current) {
+        return;
+      }
+      pcRef.current.setRemoteDescription(sdp);
+    });
+
+    socketRef.current.on("getCandidate", async (candidate: RTCIceCandidate) => {
+      if (!pcRef.current) {
+        return;
+      }
+
+      await pcRef.current.addIceCandidate(candidate);
+    });
+
+    socketRef.current.emit("join_room", {
+      room: roomName,
+    });
+
+    getMedia();
+
     return () => {
-      if (myVideo.current) {
-        myVideo.current.srcObject = null;
+      if (socketRef.current) {
+        socketRef.current.disconnect();
       }
-      if (userVideo.current) {
-        userVideo.current.srcObject = null;
+      if (pcRef.current) {
+        pcRef.current.close();
       }
-      stream?.getTracks().forEach((track) => track.stop());
     };
-  }, [audioEnabled, videoEnabled]);
-
-  const callUser = (id: string) => {
-    const peer = new SimplePeer({
-      initiator: true,
-      trickle: false,
-      stream: stream!,
-    });
-
-    peer.on("signal", (data) => {
-      console.log("SIGNAL", data);
-    });
-
-    peer.on("stream", (userStream) => {
-      if (userVideo.current) {
-        userVideo.current.srcObject = userStream;
-      }
-    });
-
-    peer.on("close", () => {
-      setCallEnded(true);
-    });
-
-    connectionRef.current = peer;
-    setPeer(peer);
-  };
-
-  const answerCall = (signalData: SimplePeer.SignalData) => {
-    const peer = new SimplePeer({
-      initiator: false,
-      trickle: false,
-      stream: stream!,
-    });
-
-    peer.on("signal", (data) => {
-      // 여기서 신호를 다시 발신자에게 전송
-      console.log("ANSWER SIGNAL", data);
-    });
-
-    peer.on("stream", (userStream) => {
-      if (userVideo.current) {
-        userVideo.current.srcObject = userStream;
-      }
-    });
-
-    peer.signal(signalData);
-    connectionRef.current = peer;
-    setCallAccepted(true);
-    setPeer(peer);
-  };
-
-  const leaveCall = () => {
-    setCallEnded(true);
-    connectionRef.current?.destroy();
-    navigate("/");
-  };
+  }, []);
 
   return (
-    <>
-      <Nav />
-      <div className={styles.container}>
-        <div className={styles.videoContainer}>
-          {stream && (
-            <video
-              playsInline
-              muted
-              ref={myVideo}
-              autoPlay
-              className={styles.video}
-            />
-          )}
-          {callAccepted && !callEnded && (
-            <video
-              playsInline
-              ref={userVideo}
-              autoPlay
-              className={styles.video}
-            />
-          )}
-        </div>
-        <div className={styles.controls}>
-          <input
-            type="text"
-            value={idToCall}
-            onChange={(e) => setIdToCall(e.target.value)}
-            placeholder="전화할 ID를 입력하세요"
-            className={styles.inputField}
-          />
-          <div>
-            {callAccepted && !callEnded ? (
-              <>
-                <button onClick={leaveCall} className={styles.button}>
-                  통화 종료
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => callUser(idToCall)}
-                className={styles.button}
-              >
-                전화 걸기
-              </button>
-            )}
-          </div>
-        </div>
-        <p>사용자 이름: {name}</p>
-      </div>
-    </>
+    <div>
+      <video
+        id="remotevideo"
+        style={{
+          width: 240,
+          height: 240,
+          backgroundColor: "black",
+        }}
+        ref={myVideoRef}
+        autoPlay
+      />
+      <video
+        id="remotevideo"
+        style={{
+          width: 240,
+          height: 240,
+          backgroundColor: "black",
+        }}
+        ref={remoteVideoRef}
+        autoPlay
+      />
+    </div>
   );
 };
 

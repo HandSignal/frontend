@@ -18,9 +18,9 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Entry />} />
           <Route path="/home" element={<Main />} />
-          <Route path="/recognize" element={<Recognize />} />;
-          <Route path="/Videocall" element={<VideoCall />} />;
-          <Route path="/videocall-entry" element={<VideoCallEntry />} />;
+          <Route path="/recognize" element={<Recognize />} />
+          <Route path="/videocall" element={<VideoCall />} />
+          <Route path="/videocall-entry" element={<VideoCallEntry />} />
           <Route path="/page1" element={<Page1 />} />
           <Route path="/page2" element={<Page2 />} />
           <Route path="/page3" element={<Page3 />} />
