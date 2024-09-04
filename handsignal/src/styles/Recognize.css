@@ -5,53 +5,24 @@
   height: 100vh;
   overflow: hidden;
   display: flex;
-  flex-direction: row;
+  flex-direction: column; /* 세로 방향으로 정렬 */
   justify-content: center;
   align-items: center;
   padding-top: 35px;
 }
 
+.webcam-container {
+  position: relative;
+  width: 720px;
+  height: 480px;
+}
+
 .canvas {
-  margin-right: 200px;
   position: absolute;
-  width: 70%;
-  height: 80%;
+  width: 100%;
+  height: 100%;
   background-color: #fff;
   border-radius: 30px;
-}
-
-.buttonContainer {
-  position: absolute;
-  right: 0;
-  top: 15%;
-  width: 20vw;
-  height: 80vh;
-  margin-right: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 30px;
-  z-index: 9999;
-}
-
-.button {
-  width: 100%;
-  max-width: 170px;
-  color: #311505;
-  background-color: #ffffff;
-  font-weight: 700;
-  font-size: 20px;
-  border: none;
-  border-radius: 40px;
-  padding: 25px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.button:hover {
-  color: white;
-  background-color: #311505;
 }
 
 .countdown {
@@ -61,10 +32,10 @@
   transform: translate(-50%, -50%);
   font-size: 64px;
   font-weight: bold;
-  color: red;
-  background: rgba(0, 0, 0, 0.6);
-  padding: 16px;
-  border-radius: 10px;
+  color: #ffecc4;
+  background: rgba(255, 152, 0, 0.8);
+  padding: 16px 32px;
+  border-radius: 100px;
 }
 
 .recording-indicator {
@@ -73,12 +44,50 @@
   right: 10px;
   font-size: 32px;
   font-weight: bold;
-  color: red;
+  color: #ff9800;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 10px;
+  border-radius: 100px;
 }
 
-@media (max-width: 600px) {
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+}
+
+.button {
+  margin: 0 10px; /* 버튼들 사이의 간격 */
+  color: #311505;
+  background-color: #ffffff;
+  font-weight: 700;
+  font-size: 20px;
+  border: none;
+  border-radius: 40px;
+  padding: 15px 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button:hover {
+  color: white;
+  background-color: #311505;
+}
+
+@media (max-width: 1000px) {
+  .webcam-container {
+    width: 100%;
+    height: auto;
+  }
+
   .canvas {
-    width: 50%;
-    height: 60%;
+    min-width: 300px;
+    min-height: 300px;
+  }
+
+  .button {
+    padding: 10px 20px;
+    font-size: 16px;
   }
 }
