@@ -24,7 +24,6 @@ const Recognize = () => {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cameraRef = useRef<Camera | null>(null);
-
   const [holistic, setHolistic] = useState<Holistic | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedData, setRecordedData] = useState<FrameData>({
@@ -36,7 +35,6 @@ const Recognize = () => {
     null
   );
   const [isCameraOn, setIsCameraOn] = useState(false);
-
   const [countdown, setCountdown] = useState<number>(0);
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
@@ -79,8 +77,7 @@ const Recognize = () => {
       setHolistic(newHolistic);
 
       return () => {
-        if (holistic) {
-          (holistic as Holistic).close();
+        if (newHolistic) {
           setHolistic(null);
         }
       };
@@ -318,7 +315,6 @@ const Recognize = () => {
           )}
         </div>
 
-        {/* 버튼들을 webcam-container 바로 아래에 위치시키기 위한 div */}
         <div className="buttonContainer">
           <button
             className="button"
