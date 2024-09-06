@@ -107,10 +107,10 @@ const VideoCallEntry: React.FC = () => {
     try {
       let createdRoomId: string;
 
-      if (roomId && roomId.trim()) {
-        createdRoomId = roomId.trim(); // Use the provided roomId
+      if (roomId) {
+        createdRoomId = roomId;
       } else {
-        createdRoomId = generateRoomId(); // Generate a random roomId
+        createdRoomId = generateRoomId();
       }
 
       await axios.post(

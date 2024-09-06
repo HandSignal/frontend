@@ -6,7 +6,7 @@
   height: 100vh;
   padding: 20px;
   box-sizing: border-box;
-  background-color: #f2f2f2;
+  background: linear-gradient(to bottom right, #fff4dd, #f6cf7a);
 }
 
 .title {
