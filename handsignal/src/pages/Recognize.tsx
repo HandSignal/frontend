@@ -3,7 +3,6 @@ import Webcam from "react-webcam";
 import { Camera } from "@mediapipe/camera_utils";
 import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
-import "../styles/Recognize.css";
 import Nav from "./Nav";
 import axios from "axios";
 
@@ -23,7 +22,6 @@ interface FrameData {
 const Recognize = () => {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cameraRef = useRef<Camera | null>(null);
   const [holistic, setHolistic] = useState<Holistic | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedData, setRecordedData] = useState<FrameData>({
@@ -34,7 +32,6 @@ const Recognize = () => {
   const [cameraPermission, setCameraPermission] = useState<boolean | null>(
     null
   );
-  const [isCameraOn, setIsCameraOn] = useState(false);
   const [countdown, setCountdown] = useState<number>(0);
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
@@ -149,30 +146,17 @@ const Recognize = () => {
           height: 720,
         });
 
-        cameraRef.current = camera;
-
-        if (isCameraOn) {
-          camera.start();
-        } else {
-          camera.stop();
-        }
-
+        camera.start();
         holistic.onResults(onResults);
 
         return () => {
           camera.stop();
-          cameraRef.current = null;
         };
       }
     }
-  }, [holistic, onResults, cameraPermission, isCameraOn]);
+  }, [holistic, onResults, cameraPermission]);
 
   const toggleRecording = () => {
-    if (!isCameraOn) {
-      alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
-      return;
-    }
-
     if (isCountdownActive) {
       setIsCountdownActive(false);
       setCountdown(0);
@@ -187,14 +171,14 @@ const Recognize = () => {
     } else {
       setIsCountdownActive(true);
       setCountdown(3);
-      setIsRecordingIndicatorVisible(false); // 카운트다운 중에는 표시하지 않음
+      setIsRecordingIndicatorVisible(false);
 
       const countdownInterval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(countdownInterval);
             setIsRecording(true);
-            setIsRecordingIndicatorVisible(true); // 카운트다운 종료 후 녹화 시작
+            setIsRecordingIndicatorVisible(true);
             setRecordedData({
               pose_keypoints: [],
               left_hand_keypoints: [],
@@ -206,41 +190,6 @@ const Recognize = () => {
         });
       }, 1000);
     }
-  };
-
-  const toggleCamera = () => {
-    setIsCameraOn((prev) => {
-      const newStatus = !prev;
-
-      if (newStatus && webcamRef.current) {
-        const video = webcamRef.current.video;
-        if (video) {
-          if (!cameraRef.current) {
-            const camera = new Camera(video, {
-              onFrame: async () => {
-                try {
-                  if (holistic) {
-                    await holistic.send({ image: video });
-                  }
-                } catch (error) {
-                  console.error("Error sending image to holistic:", error);
-                }
-              },
-              width: 1920,
-              height: 1080,
-            });
-            cameraRef.current = camera;
-            camera.start();
-          } else {
-            cameraRef.current.start();
-          }
-        }
-      } else if (cameraRef.current) {
-        cameraRef.current.stop();
-      }
-
-      return newStatus;
-    });
   };
 
   const saveDataToServer = async () => {
@@ -316,13 +265,6 @@ const Recognize = () => {
         </div>
 
         <div className="buttonContainer">
-          <button
-            className="button"
-            onClick={toggleCamera}
-            disabled={cameraPermission === null}
-          >
-            {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
-          </button>
           <button
             className="button"
             onClick={toggleRecording}
