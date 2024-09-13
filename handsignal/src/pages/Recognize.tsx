@@ -5,7 +5,6 @@ import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
-import axios from "axios";
 
 interface Keypoint {
   x: number;
@@ -42,6 +41,7 @@ const Recognize = () => {
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
+  // 카메라 권한 요청 함수
   useEffect(() => {
     const requestCameraPermission = async () => {
       try {
@@ -55,7 +55,7 @@ const Recognize = () => {
           setCameraPermission(false);
         }
       } catch (error) {
-        console.error("Camera permission error:", error);
+        console.error("카메라 권한 요청 오류:", error);
         setCameraPermission(false);
       }
     };
@@ -63,6 +63,7 @@ const Recognize = () => {
     requestCameraPermission();
   }, []);
 
+  // Holistic 인스턴스 초기화 및 정리
   useEffect(() => {
     if (cameraPermission === true && holistic === null) {
       const newHolistic = new Holistic({
@@ -87,6 +88,7 @@ const Recognize = () => {
     }
   }, [cameraPermission, holistic]);
 
+  // Holistic 결과 처리 함수
   const onResults = useCallback(
     (results: Results) => {
       const canvasCtx = canvasRef.current?.getContext("2d");
@@ -134,6 +136,7 @@ const Recognize = () => {
     [isRecording]
   );
 
+  // 카메라 및 Holistic 인스턴스 설정
   useEffect(() => {
     if (cameraPermission === true && holistic && webcamRef.current) {
       const video = webcamRef.current.video;
@@ -145,7 +148,7 @@ const Recognize = () => {
                 await holistic.send({ image: video });
               }
             } catch (error) {
-              console.error("Error sending image to holistic:", error);
+              console.error("Holistic에 이미지 전송 오류:", error);
             }
           },
           width: 1280,
@@ -170,6 +173,7 @@ const Recognize = () => {
     }
   }, [holistic, onResults, cameraPermission, isCameraOn]);
 
+  // 녹화 시작/중지 및 카운트다운 처리
   const toggleRecording = () => {
     if (!isCameraOn) {
       alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
@@ -190,14 +194,14 @@ const Recognize = () => {
     } else {
       setIsCountdownActive(true);
       setCountdown(3);
-      setIsRecordingIndicatorVisible(true);
+      setIsRecordingIndicatorVisible(false); // 카운트다운 중에는 표시하지 않음
 
       const countdownInterval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(countdownInterval);
             setIsRecording(true);
-            setIsRecordingIndicatorVisible(false);
+            setIsRecordingIndicatorVisible(true); // 카운트다운 종료 후 녹화 시작
             setRecordedData({
               pose_keypoints: [],
               left_hand_keypoints: [],
@@ -211,6 +215,7 @@ const Recognize = () => {
     }
   };
 
+  // 카메라 켜기/끄기 처리
   const toggleCamera = () => {
     setIsCameraOn((prev) => {
       const newStatus = !prev;
@@ -226,7 +231,7 @@ const Recognize = () => {
                     await holistic.send({ image: video });
                   }
                 } catch (error) {
-                  console.error("Error sending image to holistic:", error);
+                  console.error("Holistic에 이미지 전송 오류:", error);
                 }
               },
               width: 1920,
@@ -246,9 +251,9 @@ const Recognize = () => {
     });
   };
 
-  const saveDataToServer = async () => {
+  // 녹화된 데이터 다운로드 처리
+  const downloadData = () => {
     if (!recordedData.pose_keypoints.length) {
-      console.warn("저장할 데이터가 없습니다.");
       alert("저장할 데이터가 없습니다.");
       return;
     }
@@ -259,57 +264,45 @@ const Recognize = () => {
       right_hand_keypoint: recordedData.right_hand_keypoints,
     };
 
-    const formData = new FormData();
-    formData.append(
-      "file",
-      new Blob([JSON.stringify(formattedData, null, 2)], {
-        type: "application/json",
-      }),
-      "recorded_data.json"
-    );
+    const blob = new Blob([JSON.stringify(formattedData, null, 2)], {
+      type: "application/json",
+    });
 
-    try {
-      console.log("서버로 데이터 전송 시작");
-      const response = await axios.post(
-        "http://43.203.16.219:5000/files/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        console.log("데이터가 성공적으로 저장되었습니다.");
-        alert("데이터가 성공적으로 저장되었습니다.");
-      } else {
-        console.log("데이터 저장에 실패했습니다. 상태 코드:", response.status);
-        alert("데이터 저장에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("데이터 전송 중 오류 발생:", error);
-      alert("데이터 저장 중 오류가 발생했습니다.");
-    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "recorded_data.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
     <>
       <Nav />
       <div className="container">
-        <Webcam
-          audio={false}
-          style={{ visibility: "hidden" }}
-          width={1920}
-          height={1080}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={{
-            width: 1920,
-            height: 1080,
-            facingMode: "user",
-          }}
-        />
+        <div className="webcam-container">
+          <canvas ref={canvasRef} className="canvas" width={720} height={480} />
+          <Webcam
+            audio={false}
+            style={{ visibility: "hidden" }}
+            width={720}
+            height={480}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            videoConstraints={{
+              width: 720,
+              height: 480,
+              facingMode: "user",
+            }}
+          />
+          {isCountdownActive && <div className="countdown">{countdown}</div>}
+          {!isCountdownActive && isRecordingIndicatorVisible && (
+            <div className="recording-indicator">녹화 중</div>
+          )}
+        </div>
+
         <div className="buttonContainer">
           <button
             className="button"
@@ -327,17 +320,12 @@ const Recognize = () => {
           </button>
           <button
             className="button"
-            onClick={saveDataToServer}
+            onClick={downloadData}
             disabled={!recordedData.pose_keypoints.length}
           >
-            데이터 저장
+            데이터 다운로드
           </button>
         </div>
-        <canvas ref={canvasRef} className="canvas" width={1920} height={1080} />
-        {isCountdownActive && <div className="countdown">{countdown}</div>}
-        {isRecordingIndicatorVisible && (
-          <div className="recording-indicator">녹화 중</div>
-        )}
       </div>
     </>
   );
