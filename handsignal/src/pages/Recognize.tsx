@@ -41,6 +41,7 @@ const Recognize = () => {
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
+  // 카메라 권한 요청 함수
   useEffect(() => {
     const requestCameraPermission = async () => {
       try {
@@ -54,7 +55,7 @@ const Recognize = () => {
           setCameraPermission(false);
         }
       } catch (error) {
-        console.error("Camera permission error:", error);
+        console.error("카메라 권한 요청 오류:", error);
         setCameraPermission(false);
       }
     };
@@ -62,6 +63,7 @@ const Recognize = () => {
     requestCameraPermission();
   }, []);
 
+  // Holistic 인스턴스 초기화 및 정리
   useEffect(() => {
     if (cameraPermission === true && holistic === null) {
       const newHolistic = new Holistic({
@@ -86,6 +88,7 @@ const Recognize = () => {
     }
   }, [cameraPermission, holistic]);
 
+  // Holistic 결과 처리 함수
   const onResults = useCallback(
     (results: Results) => {
       const canvasCtx = canvasRef.current?.getContext("2d");
@@ -133,6 +136,7 @@ const Recognize = () => {
     [isRecording]
   );
 
+  // 카메라 및 Holistic 인스턴스 설정
   useEffect(() => {
     if (cameraPermission === true && holistic && webcamRef.current) {
       const video = webcamRef.current.video;
@@ -144,7 +148,7 @@ const Recognize = () => {
                 await holistic.send({ image: video });
               }
             } catch (error) {
-              console.error("Error sending image to holistic:", error);
+              console.error("Holistic에 이미지 전송 오류:", error);
             }
           },
           width: 1280,
@@ -169,6 +173,7 @@ const Recognize = () => {
     }
   }, [holistic, onResults, cameraPermission, isCameraOn]);
 
+  // 녹화 시작/중지 및 카운트다운 처리
   const toggleRecording = () => {
     if (!isCameraOn) {
       alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
@@ -210,6 +215,7 @@ const Recognize = () => {
     }
   };
 
+  // 카메라 켜기/끄기 처리
   const toggleCamera = () => {
     setIsCameraOn((prev) => {
       const newStatus = !prev;
@@ -225,7 +231,7 @@ const Recognize = () => {
                     await holistic.send({ image: video });
                   }
                 } catch (error) {
-                  console.error("Error sending image to holistic:", error);
+                  console.error("Holistic에 이미지 전송 오류:", error);
                 }
               },
               width: 1920,
@@ -245,6 +251,7 @@ const Recognize = () => {
     });
   };
 
+  // 녹화된 데이터 다운로드 처리
   const downloadData = () => {
     if (!recordedData.pose_keypoints.length) {
       alert("저장할 데이터가 없습니다.");

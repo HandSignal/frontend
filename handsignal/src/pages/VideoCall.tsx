@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faMicrophone,
@@ -13,9 +13,6 @@ import { io, Socket } from "socket.io-client";
 import Nav from "./Nav";
 import Webcam from "react-webcam";
 import { Holistic, Results } from "@mediapipe/holistic";
-import { Camera } from "@mediapipe/camera_utils";
-import { drawCanvas } from "../utils/drawCanvas";
-import axios from "axios";
 
 // Keypoint and FrameData interfaces
 interface Keypoint {
@@ -32,17 +29,19 @@ interface FrameData {
 }
 
 const VideoCall = () => {
+  // States
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [recording, setRecording] = useState(false);
+  const [translateEnabled, setTranslateEnabled] = useState(false);
+  const [translationResult, setTranslationResult] = useState("");
+  const [userName, setUserName] = useState("User");
+  const [roomId, setRoomId] = useState<string>("");
   const [recordedData, setRecordedData] = useState<FrameData>({
     pose_keypoints: [],
     left_hand_keypoints: [],
     right_hand_keypoints: [],
   });
-  const [holistic, setHolistic] = useState<Holistic | null>(null);
-  const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
-    useState(false);
 
   // Refs
   const socketRef = useRef<Socket>();
@@ -50,9 +49,9 @@ const VideoCall = () => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection>();
   const streamRef = useRef<MediaStream | null>(null);
+  const holisticRef = useRef<Holistic | null>(null);
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const cameraRef = useRef<Camera | null>(null);
 
   // Media Handlers
   const toggleMedia = (type: "audio" | "video") => {
@@ -95,36 +94,58 @@ const VideoCall = () => {
     }
   };
 
-  const onResults = useCallback(
-    (results: Results) => {
-      const canvasCtx = canvasRef.current?.getContext("2d");
-      if (canvasCtx) {
-        drawCanvas(canvasCtx, results);
-      }
+  const updateMediaTracks = () => {
+    if (streamRef.current) {
+      const audioTracks = streamRef.current.getAudioTracks();
+      const videoTracks = streamRef.current.getVideoTracks();
 
-      const poseKeypoints: Keypoint[] =
-        results.poseLandmarks?.map((point) => ({
-          x: point.x,
-          y: point.y,
-          z: point.z,
-          visibility: point.visibility ?? 0,
-        })) || [];
+      // Enable/disable audio tracks
+      audioTracks.forEach((track) => (track.enabled = audioEnabled));
 
-      const leftHandKeypoints =
-        results.leftHandLandmarks?.map((point) => ({
-          x: point.x,
-          y: point.y,
-          z: point.z,
-        })) || [];
+      // Enable/disable video tracks
+      videoTracks.forEach((track) => {
+        track.enabled = videoEnabled;
+        if (!videoEnabled) {
+          track.stop(); // Stop the track if video is disabled
+        }
+      });
+    }
+  };
 
-      const rightHandKeypoints =
-        results.rightHandLandmarks?.map((point) => ({
-          x: point.x,
-          y: point.y,
-          z: point.z,
-        })) || [];
+  const startRecording = () => {
+    setRecordedData({
+      pose_keypoints: [],
+      left_hand_keypoints: [],
+      right_hand_keypoints: [],
+    });
 
-      if (recording) {
+    const holistic = holisticRef.current;
+    if (holistic) {
+      holistic.onResults((results: Results) => {
+        console.log("Results received:", results); // Debug log
+
+        const poseKeypoints =
+          results.poseLandmarks?.map((point) => ({
+            x: point.x,
+            y: point.y,
+            z: point.z,
+            visibility: point.visibility ?? 0,
+          })) || [];
+
+        const leftHandKeypoints =
+          results.leftHandLandmarks?.map((point) => ({
+            x: point.x,
+            y: point.y,
+            z: point.z,
+          })) || [];
+
+        const rightHandKeypoints =
+          results.rightHandLandmarks?.map((point) => ({
+            x: point.x,
+            y: point.y,
+            z: point.z,
+          })) || [];
+
         setRecordedData((prevData) => ({
           pose_keypoints: [...prevData.pose_keypoints, poseKeypoints],
           left_hand_keypoints: [
@@ -136,25 +157,27 @@ const VideoCall = () => {
             rightHandKeypoints,
           ],
         }));
-      }
-    },
-    [recording]
-  );
-
-  const startRecording = () => {
-    if (holistic) {
-      holistic.onResults(onResults);
-      setRecording(true);
-      setIsRecordingIndicatorVisible(true);
+      });
+    } else {
+      console.error("Holistic instance is not initialized");
     }
+    setRecording(true);
   };
 
   const stopRecording = () => {
-    if (holistic) {
-      holistic.onResults(() => {});
+    if (holisticRef.current) {
+      holisticRef.current.onResults(() => {}); // Stop receiving results
     }
 
-    const blob = new Blob([JSON.stringify(recordedData, null, 2)], {
+    // Save data to a JSON file
+    downloadJSONFile(recordedData);
+
+    setRecording(false);
+  };
+
+  // Function to download JSON file
+  const downloadJSONFile = (data: FrameData) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
@@ -162,82 +185,26 @@ const VideoCall = () => {
     a.href = url;
     a.download = "recorded_data.json";
     a.click();
-    URL.revokeObjectURL(url);
-
-    setRecording(false);
-    setIsRecordingIndicatorVisible(false);
+    URL.revokeObjectURL(url); // Clean up the URL object
   };
 
-  const saveDataToServer = async () => {
-    if (!recordedData.pose_keypoints.length) {
-      alert("저장할 데이터가 없습니다.");
-      return;
-    }
-
-    const formattedData = {
-      pose_keypoints: recordedData.pose_keypoints,
-      left_hand_keypoints: recordedData.left_hand_keypoints,
-      right_hand_keypoints: recordedData.right_hand_keypoints,
-    };
-
-    const formData = new FormData();
-    formData.append(
-      "file",
-      new Blob([JSON.stringify(formattedData, null, 2)], {
-        type: "application/json",
-      }),
-      "recorded_data.json"
-    );
-
-    try {
-      const response = await axios.post(
-        "http://43.203.16.219:5000/files/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        alert("데이터가 성공적으로 저장되었습니다.");
-      } else {
-        alert("데이터 저장에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("데이터 전송 중 오류 발생:", error);
-      alert("데이터 저장 중 오류가 발생했습니다.");
-    }
+  // Translation Handlers
+  const handleTranslate = () => {
+    setTranslateEnabled(true);
+    setTranslationResult("번역 결과가 여기에 표시됩니다.");
   };
 
-  // Define WebRTC createOffer and createAnswer functions
-  const createOffer = async () => {
-    if (pcRef.current) {
-      const offer = await pcRef.current.createOffer();
-      await pcRef.current.setLocalDescription(offer);
-
-      socketRef.current?.emit("offer", offer);
-    }
+  const handleSendTranslation = () => {
+    console.log("Sending translation:", translationResult);
   };
 
-  const createAnswer = async (offer: RTCSessionDescriptionInit) => {
-    if (pcRef.current) {
-      await pcRef.current.setRemoteDescription(offer);
-      const answer = await pcRef.current.createAnswer();
-      await pcRef.current.setLocalDescription(answer);
-
-      socketRef.current?.emit("answer", answer);
-    }
-  };
-
+  // Socket and PeerConnection setup
   useEffect(() => {
-    getMedia();
-  }, [getMedia]);
+    socketRef.current = io("localhost:8080");
 
-  useEffect(() => {
-    socketRef.current = io("http://43.203.16.219:5000");
-    pcRef.current = new RTCPeerConnection();
+    pcRef.current = new RTCPeerConnection({
+      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+    });
 
     socketRef.current.on("all_users", (allUsers) => {
       if (allUsers.length > 0) {
@@ -251,51 +218,160 @@ const VideoCall = () => {
         pcRef.current.setRemoteDescription(sdp);
       }
     });
-
-    socketRef.current.on("getCandidate", (candidate) => {
+    socketRef.current.on("getCandidate", async (candidate) => {
       if (pcRef.current) {
-        pcRef.current.addIceCandidate(new RTCIceCandidate(candidate));
+        await pcRef.current.addIceCandidate(candidate);
       }
     });
+
+    getMedia();
+
+    return () => {
+      socketRef.current?.disconnect();
+      pcRef.current?.close();
+    };
   }, []);
 
+  const createOffer = async () => {
+    if (pcRef.current && socketRef.current) {
+      try {
+        const sdp = await pcRef.current.createOffer();
+        await pcRef.current.setLocalDescription(sdp);
+        socketRef.current.emit("offer", sdp);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  const createAnswer = async (sdp: RTCSessionDescription) => {
+    if (pcRef.current && socketRef.current) {
+      try {
+        await pcRef.current.setRemoteDescription(sdp);
+        const answerSdp = await pcRef.current.createAnswer();
+        await pcRef.current.setLocalDescription(answerSdp);
+        socketRef.current.emit("answer", answerSdp);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  // Update media tracks when audio/video states change
+  useEffect(() => {
+    if (streamRef.current) {
+      updateMediaTracks();
+    } else {
+      getMedia();
+    }
+  }, [audioEnabled, videoEnabled]);
+
+  // Holistic initialization
+  useEffect(() => {
+    if (webcamRef.current && !holisticRef.current) {
+      const holistic = new Holistic({
+        locateFile: (file) =>
+          `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`,
+      });
+
+      holistic.setOptions({
+        modelComplexity: 0,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
+      });
+
+      holisticRef.current = holistic;
+
+      holisticRef.current.onResults((results: Results) => {
+        // Optional: Process results if needed
+      });
+    }
+
+    return () => {
+      if (holisticRef.current) {
+        holisticRef.current = null; // Cleanup on unmount
+      }
+    };
+  }, [webcamRef.current]);
+
   return (
-    <div>
+    <div className={styles.container}>
       <Nav />
-      <div className={styles.container}>
-        <div className={styles.videos}>
-          <video ref={myVideoRef} autoPlay muted className={styles.video} />
-          <video ref={remoteVideoRef} autoPlay className={styles.video} />
-          <Webcam ref={webcamRef} className={styles.hiddenWebcam} />
-          <canvas ref={canvasRef} className={styles.overlayCanvas} />
+      <div className={styles.videoContainer}>
+        <div className={styles.videoWrapper}>
+          <Webcam
+            ref={webcamRef}
+            audio={false}
+            videoConstraints={{ facingMode: "user" }}
+            className={videoEnabled ? styles.video : styles.videoDisabled}
+          />
+          <canvas
+            ref={canvasRef}
+            className={styles.canvas}
+            width={640}
+            height={480}
+          />
+          <div className={styles.nameTag}>{userName}</div>
         </div>
-
+        <div className={styles.videoWrapper}>
+          <video ref={remoteVideoRef} className={styles.video} autoPlay />
+          <div className={styles.nameTag}>Remote User</div>
+        </div>
+      </div>
+      <div className={styles.controls}>
+        <div className={styles.iconControls}>
+          <div onClick={() => toggleMedia("audio")} className={styles.icon}>
+            <FontAwesomeIcon 
+              icon={audioEnabled ? faMicrophone : faMicrophoneSlash}
+              size="2x"
+              color={audioEnabled ? "#4CAF50" : "#f44336"}
+            />
+            <span className={styles.iconText}>
+              {audioEnabled ? "마이크 켜기" : "마이크 끄기"}
+            </span>
+          </div>
+          <div onClick={() => toggleMedia("video")} className={styles.icon}>
+            <FontAwesomeIcon
+              icon={videoEnabled ? faVideo : faVideoSlash}
+              size="2x"
+              color={videoEnabled ? "#4CAF50" : "#f44336"}
+            />
+            <span className={styles.iconText}>
+              {videoEnabled ? "카메라 켜기" : "카메라 끄기"}
+            </span>
+          </div>
+          <div
+            onClick={() => (recording ? stopRecording() : startRecording())}
+            className={styles.icon}
+          >
+            <FontAwesomeIcon
+              icon={faRecordVinyl}
+              size="2x"
+              color={recording ? "#f44336" : "#4CAF50"}
+            />
+            <span className={styles.iconText}>
+              {recording ? "녹화 중지" : "녹화 시작"}
+            </span>
+          </div>
+        </div>
         <div className={styles.controls}>
-          <FontAwesomeIcon
-            icon={audioEnabled ? faMicrophone : faMicrophoneSlash}
-            className={styles.icon}
-            onClick={() => toggleMedia("audio")}
-          />
-          <FontAwesomeIcon
-            icon={videoEnabled ? faVideo : faVideoSlash}
-            className={styles.icon}
-            onClick={() => toggleMedia("video")}
-          />
-          <FontAwesomeIcon
-            icon={faRecordVinyl}
-            className={styles.icon}
-            onClick={recording ? stopRecording : startRecording}
-          />
-          <FontAwesomeIcon
-            icon={faPaperPlane}
-            className={styles.icon}
-            onClick={saveDataToServer}
-          />
+          <button onClick={handleTranslate} className={styles.button}>
+            번역하기
+          </button>
+          {translateEnabled && (
+            <div className={styles.translateContainer}>
+              <textarea
+                className={styles.inputField}
+                value={translationResult}
+                onChange={(e) => setTranslationResult(e.target.value)}
+                placeholder="번역 결과를 입력하세요"
+              />
+              <button onClick={handleSendTranslation} className={styles.button}>
+                <FontAwesomeIcon icon={faPaperPlane} /> 번역 결과 전송
+              </button>
+            </div>
+          )}
         </div>
-
-        {isRecordingIndicatorVisible && (
-          <div className={styles.recordingIndicator}>Recording...</div>
-        )}
       </div>
     </div>
   );
