@@ -1,5 +1,5 @@
 {
-  "proxy": "http://43.203.16.219:5000",
+  "proxy": "http://43.203.16.219:8080",
   "name": "handsignal",
   "version": "0.1.0",
   "private": true,
