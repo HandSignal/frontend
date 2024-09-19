@@ -64,7 +64,7 @@ const Recognize = () => {
       } catch (error) {
         console.error("카메라 권한 요청 오류:", error);
         alert(
-          "카메라 권한 요청에 실패했습니다. 브라우저의 카메라 권한을 확인해 주세요."
+          "카메라 권한 요청에 실패했습니다. 브라우저의 카메라 권한을 확인해 주세요.."
         );
         setCameraPermission(false);
       }
