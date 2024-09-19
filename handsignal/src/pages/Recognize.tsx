@@ -5,6 +5,7 @@ import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
+import axios from "axios";
 
 interface Keypoint {
   x: number;
@@ -251,31 +252,56 @@ const Recognize = () => {
     });
   };
 
-  // 녹화된 데이터 다운로드 처리
-  const downloadData = () => {
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    uploadData();
+  };
+
+  const uploadData = async () => {
     if (!recordedData.pose_keypoints.length) {
       alert("저장할 데이터가 없습니다.");
       return;
     }
 
+    // JSON 데이터를 문자열로 변환
     const formattedData = {
-      pose_keypoint: recordedData.pose_keypoints,
-      left_hand_keypoint: recordedData.left_hand_keypoints,
-      right_hand_keypoint: recordedData.right_hand_keypoints,
+      pose_keypoints: recordedData.pose_keypoints,
+      left_hand_keypoints: recordedData.left_hand_keypoints,
+      right_hand_keypoints: recordedData.right_hand_keypoints,
     };
 
-    const blob = new Blob([JSON.stringify(formattedData, null, 2)], {
-      type: "application/json",
+    // JSON 데이터를 Blob으로 변환
+    const blob = new Blob([JSON.stringify(formattedData)], {
+      type: "application/json", // MIME 타입을 'application/json'으로 설정
     });
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recorded_data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    // FormData 객체 생성
+    const formData = new FormData();
+    // 'data' 키로 파일을 추가 (키는 서버 요구사항에 맞게 'data'로 설정)
+    formData.append("data", blob, "recorded_data.json");
+
+    try {
+      // 서버에 파일 업로드 요청
+      const response = await axios.post(
+        "http://43.203.16.219:8080/files/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // 이 부분은 axios가 자동으로 설정
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("데이터가 성공적으로 업로드되었습니다.");
+      } else {
+        console.error("데이터 업로드 실패:", response.statusText);
+        alert("데이터 업로드에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("업로드 오류:", error);
+      alert("데이터 업로드 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -303,29 +329,33 @@ const Recognize = () => {
           )}
         </div>
 
-        <div className="buttonContainer">
-          <button
-            className="button"
-            onClick={toggleCamera}
-            disabled={cameraPermission === null}
-          >
-            {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
-          </button>
-          <button
-            className="button"
-            onClick={toggleRecording}
-            disabled={isCountdownActive}
-          >
-            {isRecording ? "녹화 중지" : "녹화 시작"}
-          </button>
-          <button
-            className="button"
-            onClick={downloadData}
-            disabled={!recordedData.pose_keypoints.length}
-          >
-            데이터 다운로드
-          </button>
-        </div>
+        <form onSubmit={handleFormSubmit}>
+          <div className="buttonContainer">
+            <button
+              className="button"
+              type="button"
+              onClick={toggleCamera}
+              disabled={cameraPermission === null}
+            >
+              {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
+            </button>
+            <button
+              className="button"
+              type="button"
+              onClick={toggleRecording}
+              disabled={isCountdownActive}
+            >
+              {isRecording ? "녹화 중지" : "녹화 시작"}
+            </button>
+            <button
+              className="button"
+              type="submit"
+              disabled={!recordedData.pose_keypoints.length}
+            >
+              데이터 업로드
+            </button>
+          </div>
+        </form>
       </div>
     </>
   );
