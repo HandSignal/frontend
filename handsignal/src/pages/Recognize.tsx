@@ -44,6 +44,13 @@ const Recognize = () => {
 
   useEffect(() => {
     const requestCameraPermission = async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert(
+          "이 브라우저는 카메라를 지원하지 않습니다. 최신 브라우저를 사용해 주세요."
+        );
+        return;
+      }
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
@@ -56,6 +63,9 @@ const Recognize = () => {
         }
       } catch (error) {
         console.error("카메라 권한 요청 오류:", error);
+        alert(
+          "카메라 권한 요청에 실패했습니다. 브라우저의 카메라 권한을 확인해 주세요."
+        );
         setCameraPermission(false);
       }
     };
@@ -268,7 +278,7 @@ const Recognize = () => {
     });
 
     const formData = new FormData();
-    formData.append("data", blob, "recorded_data.json");
+    formData.append("data", blob, "HEHE.json");
 
     try {
       const response = await axios.post(
@@ -282,14 +292,18 @@ const Recognize = () => {
       );
 
       if (response.status === 200) {
-        alert("데이터가 성공적으로 업로드되었습니다.");
+        // Display the server response here
+        const result = response.data; // Assuming server returns text or a JSON object
+        alert(`데이터가 성공적으로 업로드되었습니다. 서버 응답: ${result}`);
       } else {
-        console.error("데이터 업로드 실패:", response.statusText);
-        alert("데이터 업로드에 실패했습니다.");
+        // If the status is not 200, log the response status text
+        const errorText = response.statusText;
+        alert(`데이터 업로드 실패: ${errorText}`);
       }
     } catch (error) {
+      // Handle error
       console.error("업로드 오류:", error);
-      alert("데이터 업로드 중 오류가 발생했습니다.");
+      alert(`데이터 업로드 중 오류가 발생했습니다:`);
     }
   };
 
