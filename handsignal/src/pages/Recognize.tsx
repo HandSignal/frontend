@@ -42,7 +42,7 @@ const Recognize = () => {
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
-  const [modelResult, setModelResult] = useState<string | null>(null); // 모델 결과 상태
+  const [modelResult, setModelResult] = useState<string | null>(null);
 
   useEffect(() => {
     const requestCameraPermission = async () => {
