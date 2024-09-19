@@ -258,9 +258,9 @@ const Recognize = () => {
     }
 
     const formattedData = {
-      pose_keypoints: recordedData.pose_keypoints,
-      left_hand_keypoints: recordedData.left_hand_keypoints,
-      right_hand_keypoints: recordedData.right_hand_keypoints,
+      pose_keypoint: recordedData.pose_keypoints,
+      left_hand_keypoint: recordedData.left_hand_keypoints,
+      right_hand_keypoint: recordedData.right_hand_keypoints,
     };
 
     const blob = new Blob([JSON.stringify(formattedData)], {
