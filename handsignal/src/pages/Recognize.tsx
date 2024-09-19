@@ -42,6 +42,8 @@ const Recognize = () => {
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
+  const [modelResult, setModelResult] = useState<string | null>(null); // 모델 결과 상태
+
   useEffect(() => {
     const requestCameraPermission = async () => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -282,7 +284,7 @@ const Recognize = () => {
 
     try {
       const response = await axios.post(
-        "http://43.203.16.219:8080/files/upload",
+        "http://43.203.16.219:8080/translate/sign-language",
         formData,
         {
           headers: {
@@ -292,18 +294,22 @@ const Recognize = () => {
       );
 
       if (response.status === 200) {
-        // Display the server response here
-        const result = response.data; // Assuming server returns text or a JSON object
-        alert(`데이터가 성공적으로 업로드되었습니다. 서버 응답: ${result}`);
+        const {
+          file: { modelResult },
+        } = response.data;
+
+        setModelResult(modelResult);
+
+        alert(
+          `데이터가 성공적으로 업로드되었습니다. 서버 응답: ${modelResult}`
+        );
       } else {
-        // If the status is not 200, log the response status text
         const errorText = response.statusText;
         alert(`데이터 업로드 실패: ${errorText}`);
       }
     } catch (error) {
-      // Handle error
       console.error("업로드 오류:", error);
-      alert(`데이터 업로드 중 오류가 발생했습니다:`);
+      alert(`데이터 업로드 중 오류가 발생했습니다.`);
     }
   };
 
@@ -359,6 +365,14 @@ const Recognize = () => {
             </button>
           </div>
         </form>
+
+        {/* modelResult 값이 있을 때만 화면에 표시 */}
+        {modelResult && (
+          <div className="model-result">
+            <h3>모델 결과:</h3>
+            <p>{modelResult}</p>
+          </div>
+        )}
       </div>
     </>
   );
