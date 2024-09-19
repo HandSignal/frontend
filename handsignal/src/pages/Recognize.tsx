@@ -5,6 +5,7 @@ import { Holistic, Results } from "@mediapipe/holistic";
 import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
+import axios from "axios";
 
 interface Keypoint {
   x: number;
@@ -41,9 +42,15 @@ const Recognize = () => {
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
-  // 카메라 권한 요청 함수
   useEffect(() => {
     const requestCameraPermission = async () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert(
+          "이 브라우저는 카메라를 지원하지 않습니다. 최신 브라우저를 사용해 주세요."
+        );
+        return;
+      }
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
@@ -56,6 +63,9 @@ const Recognize = () => {
         }
       } catch (error) {
         console.error("카메라 권한 요청 오류:", error);
+        alert(
+          "카메라 권한 요청에 실패했습니다. 브라우저의 카메라 권한을 확인해 주세요."
+        );
         setCameraPermission(false);
       }
     };
@@ -63,7 +73,6 @@ const Recognize = () => {
     requestCameraPermission();
   }, []);
 
-  // Holistic 인스턴스 초기화 및 정리
   useEffect(() => {
     if (cameraPermission === true && holistic === null) {
       const newHolistic = new Holistic({
@@ -88,7 +97,6 @@ const Recognize = () => {
     }
   }, [cameraPermission, holistic]);
 
-  // Holistic 결과 처리 함수
   const onResults = useCallback(
     (results: Results) => {
       const canvasCtx = canvasRef.current?.getContext("2d");
@@ -136,7 +144,6 @@ const Recognize = () => {
     [isRecording]
   );
 
-  // 카메라 및 Holistic 인스턴스 설정
   useEffect(() => {
     if (cameraPermission === true && holistic && webcamRef.current) {
       const video = webcamRef.current.video;
@@ -173,7 +180,6 @@ const Recognize = () => {
     }
   }, [holistic, onResults, cameraPermission, isCameraOn]);
 
-  // 녹화 시작/중지 및 카운트다운 처리
   const toggleRecording = () => {
     if (!isCameraOn) {
       alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
@@ -194,14 +200,14 @@ const Recognize = () => {
     } else {
       setIsCountdownActive(true);
       setCountdown(3);
-      setIsRecordingIndicatorVisible(false); // 카운트다운 중에는 표시하지 않음
+      setIsRecordingIndicatorVisible(false);
 
       const countdownInterval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(countdownInterval);
             setIsRecording(true);
-            setIsRecordingIndicatorVisible(true); // 카운트다운 종료 후 녹화 시작
+            setIsRecordingIndicatorVisible(true);
             setRecordedData({
               pose_keypoints: [],
               left_hand_keypoints: [],
@@ -215,7 +221,6 @@ const Recognize = () => {
     }
   };
 
-  // 카메라 켜기/끄기 처리
   const toggleCamera = () => {
     setIsCameraOn((prev) => {
       const newStatus = !prev;
@@ -251,8 +256,12 @@ const Recognize = () => {
     });
   };
 
-  // 녹화된 데이터 다운로드 처리
-  const downloadData = () => {
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    uploadData();
+  };
+
+  const uploadData = async () => {
     if (!recordedData.pose_keypoints.length) {
       alert("저장할 데이터가 없습니다.");
       return;
@@ -264,18 +273,38 @@ const Recognize = () => {
       right_hand_keypoint: recordedData.right_hand_keypoints,
     };
 
-    const blob = new Blob([JSON.stringify(formattedData, null, 2)], {
+    const blob = new Blob([JSON.stringify(formattedData)], {
       type: "application/json",
     });
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "recorded_data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    const formData = new FormData();
+    formData.append("data", blob, "HEHE.json");
+
+    try {
+      const response = await axios.post(
+        "http://43.203.16.219:8080/files/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // Display the server response here
+        const result = response.data; // Assuming server returns text or a JSON object
+        alert(`데이터가 성공적으로 업로드되었습니다. 서버 응답: ${result}`);
+      } else {
+        // If the status is not 200, log the response status text
+        const errorText = response.statusText;
+        alert(`데이터 업로드 실패: ${errorText}`);
+      }
+    } catch (error) {
+      // Handle error
+      console.error("업로드 오류:", error);
+      alert(`데이터 업로드 중 오류가 발생했습니다:`);
+    }
   };
 
   return (
@@ -303,29 +332,33 @@ const Recognize = () => {
           )}
         </div>
 
-        <div className="buttonContainer">
-          <button
-            className="button"
-            onClick={toggleCamera}
-            disabled={cameraPermission === null}
-          >
-            {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
-          </button>
-          <button
-            className="button"
-            onClick={toggleRecording}
-            disabled={isCountdownActive}
-          >
-            {isRecording ? "녹화 중지" : "녹화 시작"}
-          </button>
-          <button
-            className="button"
-            onClick={downloadData}
-            disabled={!recordedData.pose_keypoints.length}
-          >
-            데이터 다운로드
-          </button>
-        </div>
+        <form onSubmit={handleFormSubmit} encType="multipart/form-data">
+          <div className="buttonContainer">
+            <button
+              className="button"
+              type="button"
+              onClick={toggleCamera}
+              disabled={cameraPermission === null}
+            >
+              {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
+            </button>
+            <button
+              className="button"
+              type="button"
+              onClick={toggleRecording}
+              disabled={isCountdownActive}
+            >
+              {isRecording ? "녹화 중지" : "녹화 시작"}
+            </button>
+            <button
+              className="button"
+              type="submit"
+              disabled={!recordedData.pose_keypoints.length}
+            >
+              데이터 업로드
+            </button>
+          </div>
+        </form>
       </div>
     </>
   );
