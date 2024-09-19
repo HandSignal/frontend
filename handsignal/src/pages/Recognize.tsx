@@ -284,12 +284,7 @@ const Recognize = () => {
       // 서버에 파일 업로드 요청
       const response = await axios.post(
         "http://43.203.16.219:8080/files/upload",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // 이 부분은 axios가 자동으로 설정
-          },
-        }
+        formData
       );
 
       if (response.status === 200) {
@@ -329,7 +324,7 @@ const Recognize = () => {
           )}
         </div>
 
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleFormSubmit} encType="multipart/form-data">
           <div className="buttonContainer">
             <button
               className="button"
