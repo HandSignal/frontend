@@ -42,7 +42,6 @@ const Recognize = () => {
   const [isRecordingIndicatorVisible, setIsRecordingIndicatorVisible] =
     useState<boolean>(false);
 
-  // 카메라 권한 요청 함수
   useEffect(() => {
     const requestCameraPermission = async () => {
       try {
@@ -64,7 +63,6 @@ const Recognize = () => {
     requestCameraPermission();
   }, []);
 
-  // Holistic 인스턴스 초기화 및 정리
   useEffect(() => {
     if (cameraPermission === true && holistic === null) {
       const newHolistic = new Holistic({
@@ -89,7 +87,6 @@ const Recognize = () => {
     }
   }, [cameraPermission, holistic]);
 
-  // Holistic 결과 처리 함수
   const onResults = useCallback(
     (results: Results) => {
       const canvasCtx = canvasRef.current?.getContext("2d");
@@ -137,7 +134,6 @@ const Recognize = () => {
     [isRecording]
   );
 
-  // 카메라 및 Holistic 인스턴스 설정
   useEffect(() => {
     if (cameraPermission === true && holistic && webcamRef.current) {
       const video = webcamRef.current.video;
@@ -174,7 +170,6 @@ const Recognize = () => {
     }
   }, [holistic, onResults, cameraPermission, isCameraOn]);
 
-  // 녹화 시작/중지 및 카운트다운 처리
   const toggleRecording = () => {
     if (!isCameraOn) {
       alert("카메라가 꺼져 있습니다. 녹화를 시작하기 전에 카메라를 켜주세요.");
@@ -195,14 +190,14 @@ const Recognize = () => {
     } else {
       setIsCountdownActive(true);
       setCountdown(3);
-      setIsRecordingIndicatorVisible(false); // 카운트다운 중에는 표시하지 않음
+      setIsRecordingIndicatorVisible(false);
 
       const countdownInterval = setInterval(() => {
         setCountdown((prevCountdown) => {
           if (prevCountdown === 1) {
             clearInterval(countdownInterval);
             setIsRecording(true);
-            setIsRecordingIndicatorVisible(true); // 카운트다운 종료 후 녹화 시작
+            setIsRecordingIndicatorVisible(true);
             setRecordedData({
               pose_keypoints: [],
               left_hand_keypoints: [],
@@ -216,7 +211,6 @@ const Recognize = () => {
     }
   };
 
-  // 카메라 켜기/끄기 처리
   const toggleCamera = () => {
     setIsCameraOn((prev) => {
       const newStatus = !prev;
@@ -263,27 +257,28 @@ const Recognize = () => {
       return;
     }
 
-    // JSON 데이터를 문자열로 변환
     const formattedData = {
       pose_keypoints: recordedData.pose_keypoints,
       left_hand_keypoints: recordedData.left_hand_keypoints,
       right_hand_keypoints: recordedData.right_hand_keypoints,
     };
 
-    // JSON 데이터를 Blob으로 변환
     const blob = new Blob([JSON.stringify(formattedData)], {
       type: "application/json",
     });
 
-    // FormData 객체 생성
     const formData = new FormData();
     formData.append("data", blob, "recorded_data.json");
 
     try {
-      // 서버에 파일 업로드 요청
       const response = await axios.post(
         "http://43.203.16.219:8080/files/upload",
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       if (response.status === 200) {
