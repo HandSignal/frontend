@@ -7,7 +7,8 @@ import "../styles/Recognize.css";
 import Nav from "./Nav";
 import axios from "axios";
 import {
-  FaCamera,
+  FaVideoSlash,
+  FaVideo,
   FaLanguage,
   FaRecordVinyl,
   FaStopCircle,
@@ -350,12 +351,21 @@ const Recognize = () => {
               onClick={toggleCamera}
               disabled={cameraPermission === null}
             >
-              <FaCamera
-                style={{
-                  marginRight: "8px",
-                  transform: "translateY(3px)",
-                }}
-              />
+              {isCameraOn ? (
+                <FaVideoSlash // 카메라가 켜져 있을 때 아이콘
+                  style={{
+                    marginRight: "8px",
+                    transform: "translateY(3px)",
+                  }}
+                />
+              ) : (
+                <FaVideo // 카메라가 꺼져 있을 때 아이콘
+                  style={{
+                    marginRight: "8px",
+                    transform: "translateY(3px)",
+                  }}
+                />
+              )}
               {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
             </button>
             <button
