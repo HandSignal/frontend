@@ -32,8 +32,8 @@
   transform: translate(-50%, -50%);
   font-size: 64px;
   font-weight: bold;
-  color: #ffecc4;
-  background: rgba(255, 152, 0, 0.8);
+  color: #ff9800;
+  background: rgba(0, 0, 0, 0.6);
   padding: 16px 32px;
   border-radius: 100px;
 }
@@ -42,11 +42,11 @@
   position: absolute;
   bottom: 10px;
   right: 10px;
-  font-size: 32px;
+  font-size: 20px;
   font-weight: bold;
   color: #ff9800;
   background: rgba(0, 0, 0, 0.6);
-  padding: 10px;
+  padding: 10px 20px;
   border-radius: 100px;
 }
 
@@ -93,11 +93,12 @@
 }
 
 .model-result {
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  margin-top: 30px;
+  padding: 10px 30px;
+  border: 0px solid #ddd;
+  border-radius: 20px;
+  color: #311505;
+  background: white;
   font-size: 16px;
   text-align: center;
 }
