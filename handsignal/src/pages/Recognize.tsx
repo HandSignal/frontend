@@ -131,16 +131,11 @@ const Recognize = () => {
 
       if (isRecording) {
         setRecordedData((prevData) => ({
-          pose_keypoints: [...prevData.pose_keypoints, poseKeypoints],
-          left_hand_keypoints: [
-            ...prevData.left_hand_keypoints,
-            leftHandKeypoints,
-          ],
-          right_hand_keypoints: [
-            ...prevData.right_hand_keypoints,
-            rightHandKeypoints,
-          ],
+          pose_keypoints: prevData.pose_keypoints.concat([poseKeypoints]),
+          left_hand_keypoints: prevData.left_hand_keypoints.concat([leftHandKeypoints]),
+          right_hand_keypoints: prevData.right_hand_keypoints.concat([rightHandKeypoints]),
         }));
+        
       }
     },
     [isRecording]
