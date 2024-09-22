@@ -6,14 +6,28 @@ import styles from "../styles/Main.module.css";
 import Nav from "./Nav";
 
 const cardData = [
-  { title: "인사하기", description: "인사할 때, 알아두면 좋은 수어!" },
-  { title: "위급상황", description: "위급상황 시, 반드시 알아야 할 수어!" },
+  { title: "일상생활 속 수어", description: "수어를 처음 접한다면?" },
+  {
+    title: "노래를 통해 수어 접하기",
+    description: "수어와 조금 더 친해져볼까요?",
+  },
   { title: "기본회화", description: "조금 더 원활한 대화를 위한 수어!" },
-  { title: "더보기", description: "좀 더 많은 수어를 보고 싶다면?" },
+  {
+    title: "국립국어원 수어사전",
+    description: "더 많은 수어 단어를 찾아보세요!",
+  },
 ];
 
 const Main: React.FC = () => {
   const navigate = useNavigate();
+
+  const handleCardClick = (index: number) => {
+    if (index === 3) {
+      window.location.href = "https://sldict.korean.go.kr/front/main/main.do#";
+    } else {
+      navigate(`/page${index + 1}`);
+    }
+  };
 
   return (
     <motion.div
@@ -59,7 +73,7 @@ const Main: React.FC = () => {
           <motion.div
             key={index}
             className={styles.card}
-            onClick={() => navigate(`/page${index + 1}`)}
+            onClick={() => handleCardClick(index)}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
             aria-label={`카드 ${index + 1}`}

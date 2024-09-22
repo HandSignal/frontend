@@ -3,28 +3,28 @@ import styles from "../styles/SignList.module.css";
 
 const signData = [
   {
-    title: "안녕하세요",
-    videoUrl: "https://www.youtube.com/shorts/pLxvxWVDM4I",
+    title: "정말 괜찮아요",
+    videoUrl: "https://www.youtube.com/shorts/JkY-F3Pxlio",
   },
   {
-    title: "새해 복 많이 받으세요",
-    videoUrl: "https://www.youtube.com/shorts/LW2atE74vh4",
+    title: "무슨 일이에요?",
+    videoUrl: "https://www.youtube.com/shorts/1izr0VRcP2A",
   },
   {
-    title: "맛있게 드세요!",
-    videoUrl: "https://www.youtube.com/shorts/QLxkrMbxWMo",
+    title: "이해해요",
+    videoUrl: "https://www.youtube.com/shorts/G1qMJVF1htk",
   },
   {
-    title: "잘 부탁드립니다",
-    videoUrl: "https://www.youtube.com/shorts/cquUC-P1QGw",
+    title: "어디가세요?",
+    videoUrl: "https://www.youtube.com/shorts/0k0OJ-gIo18",
   },
   {
-    title: "만나서 반갑습니다",
-    videoUrl: "https://www.youtube.com/shorts/dEIVBu6DxCg",
+    title: "농담이에요",
+    videoUrl: "https://www.youtube.com/shorts/qxLLOXbv6OA",
   },
   {
-    title: "감사합니다",
-    videoUrl: "https://www.youtube.com/shorts/G3csBbw_j60",
+    title: "재미있어요",
+    videoUrl: "https://www.youtube.com/shorts/bYjQNJCMhRI",
   },
 ];
 

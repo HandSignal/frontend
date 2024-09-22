@@ -1,5 +1,5 @@
 import React from "react";
-import SignList from "./SignList";
+import SignList from "./SignList3";
 import { useNavigate } from "react-router-dom";
 
 import styles from "../styles/Page.module.css";
@@ -15,8 +15,8 @@ const Page3: React.FC = () => {
       <Nav />
       <div className={styles.homeContainer}>
         <header className={styles.homeHeader}>
-          <h1>인사하기 수어</h1>
-          <p>아래의 수화를 통해 다양한 인사 표현을 배워보세요.</p>
+          <h1>좀 더 원활한 대화를 원한다면?</h1>
+          <p>수어를 통해 더 풍성한 대화를 나눠보세요!</p>
         </header>
         <div className={styles.cardGrid}>
           <SignList />

@@ -274,8 +274,12 @@ const Recognize = () => {
       type: "application/json",
     });
 
+    // 현재 시간을 기준으로 파일명 생성
+    const currentTime = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `data_${currentTime}.json`;
+
     const formData = new FormData();
-    formData.append("data", blob, "HEHE.json");
+    formData.append("data", blob, filename);
 
     try {
       const response = await axios.post(
