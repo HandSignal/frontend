@@ -132,10 +132,13 @@ const Recognize = () => {
       if (isRecording) {
         setRecordedData((prevData) => ({
           pose_keypoints: prevData.pose_keypoints.concat([poseKeypoints]),
-          left_hand_keypoints: prevData.left_hand_keypoints.concat([leftHandKeypoints]),
-          right_hand_keypoints: prevData.right_hand_keypoints.concat([rightHandKeypoints]),
+          left_hand_keypoints: prevData.left_hand_keypoints.concat([
+            leftHandKeypoints,
+          ]),
+          right_hand_keypoints: prevData.right_hand_keypoints.concat([
+            rightHandKeypoints,
+          ]),
         }));
-        
       }
     },
     [isRecording]
@@ -333,7 +336,7 @@ const Recognize = () => {
           />
           {isCountdownActive && <div className="countdown">{countdown}</div>}
           {!isCountdownActive && isRecordingIndicatorVisible && (
-            <div className="recording-indicator">녹화 중</div>
+            <div className="recording-indicator">동작 인식 중입니다</div>
           )}
         </div>
 
@@ -368,8 +371,7 @@ const Recognize = () => {
         {/* modelResult 값이 있을 때만 화면에 표시 */}
         {modelResult && (
           <div className="model-result">
-            <h3>모델 결과:</h3>
-            <p>{modelResult}</p>
+            <h3>번역 결과 : {modelResult}</h3>
           </div>
         )}
       </div>
