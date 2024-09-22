@@ -3,28 +3,28 @@ import styles from "../styles/SignList.module.css";
 
 const signData = [
   {
-    title: "안녕하세요",
-    videoUrl: "https://www.youtube.com/shorts/pLxvxWVDM4I",
+    title: "흰수염고래 - 정은지",
+    videoUrl: "https://www.youtube.com/watch?v=_U0qJCp0CAw",
   },
   {
-    title: "새해 복 많이 받으세요",
-    videoUrl: "https://www.youtube.com/shorts/LW2atE74vh4",
+    title: "세글자송 - 스톤뮤직",
+    videoUrl: "https://www.youtube.com/watch?v=TzUxZe3E4tA",
   },
   {
-    title: "맛있게 드세요!",
-    videoUrl: "https://www.youtube.com/shorts/QLxkrMbxWMo",
+    title: "오래된 노래 - 유손생",
+    videoUrl: "https://www.youtube.com/watch?v=8uCbc7idGf0",
   },
   {
-    title: "잘 부탁드립니다",
-    videoUrl: "https://www.youtube.com/shorts/cquUC-P1QGw",
+    title: "신호등 - 말뚝이의 영재교실",
+    videoUrl: "https://www.youtube.com/watch?v=Tn32s1lNZ7I",
   },
   {
-    title: "만나서 반갑습니다",
-    videoUrl: "https://www.youtube.com/shorts/dEIVBu6DxCg",
+    title: "질투 - 반짝이는워터멜론",
+    videoUrl: "https://www.youtube.com/watch?v=cZXm7vmTL0o",
   },
   {
-    title: "감사합니다",
-    videoUrl: "https://www.youtube.com/shorts/G3csBbw_j60",
+    title: "누가 죄인인가 - Handspeak Korea",
+    videoUrl: "https://www.youtube.com/watch?v=AX4daVKMhBw",
   },
 ];
 
