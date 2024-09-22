@@ -301,10 +301,6 @@ const Recognize = () => {
         } = response.data;
 
         setModelResult(modelResult);
-
-        alert(
-          `데이터가 성공적으로 업로드되었습니다. 서버 응답: ${modelResult}`
-        );
       } else {
         const errorText = response.statusText;
         alert(`데이터 업로드 실패: ${errorText}`);
@@ -356,14 +352,14 @@ const Recognize = () => {
               onClick={toggleRecording}
               disabled={isCountdownActive}
             >
-              {isRecording ? "녹화 중지" : "녹화 시작"}
+              {isRecording ? "인식 중지" : "인식 시작"}
             </button>
             <button
               className="button"
               type="submit"
               disabled={!recordedData.pose_keypoints.length}
             >
-              데이터 업로드
+              번역하기
             </button>
           </div>
         </form>
