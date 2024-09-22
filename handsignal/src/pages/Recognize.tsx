@@ -6,6 +6,12 @@ import { drawCanvas } from "../utils/drawCanvas";
 import "../styles/Recognize.css";
 import Nav from "./Nav";
 import axios from "axios";
+import {
+  FaCamera,
+  FaLanguage,
+  FaRecordVinyl,
+  FaStopCircle,
+} from "react-icons/fa";
 
 interface Keypoint {
   x: number;
@@ -344,6 +350,12 @@ const Recognize = () => {
               onClick={toggleCamera}
               disabled={cameraPermission === null}
             >
+              <FaCamera
+                style={{
+                  marginRight: "8px",
+                  transform: "translateY(3px)",
+                }}
+              />
               {isCameraOn ? "카메라 끄기" : "카메라 켜기"}
             </button>
             <button
@@ -352,18 +364,43 @@ const Recognize = () => {
               onClick={toggleRecording}
               disabled={isCountdownActive}
             >
-              {isRecording ? "인식 중지" : "인식 시작"}
+              {isRecording ? (
+                <>
+                  <FaStopCircle
+                    style={{
+                      marginRight: "8px",
+                      transform: "translateY(3px)",
+                    }}
+                  />
+                  인식 중지
+                </>
+              ) : (
+                <>
+                  <FaRecordVinyl
+                    style={{
+                      marginRight: "8px",
+                      transform: "translateY(3px)",
+                    }}
+                  />
+                  인식 시작
+                </>
+              )}
             </button>
             <button
               className="button"
               type="submit"
               disabled={!recordedData.pose_keypoints.length}
             >
+              <FaLanguage
+                style={{
+                  marginRight: "8px",
+                  transform: "translateY(3px)",
+                }}
+              />
               번역하기
             </button>
           </div>
         </form>
-
         {/* modelResult 값이 있을 때만 화면에 표시 */}
         {modelResult && (
           <div className="model-result">
