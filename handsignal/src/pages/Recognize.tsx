@@ -422,4 +422,5 @@ const Recognize = () => {
   );
 };
 
+
 export default Recognize;
