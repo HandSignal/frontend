@@ -66,8 +66,6 @@ const VideoCallEntry: React.FC = () => {
     if (stream) {
       const videoTracks = stream.getVideoTracks();
       videoTracks.forEach((track) => (track.enabled = videoEnabled));
-
-      // Ensure video track is re-initialized if toggled
       if (myVideo.current) {
         myVideo.current.srcObject = stream;
       }
