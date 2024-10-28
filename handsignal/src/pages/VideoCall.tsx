@@ -14,7 +14,6 @@ import Nav from "./Nav";
 import Webcam from "react-webcam";
 import { Holistic, Results } from "@mediapipe/holistic";
 
-// Keypoint and FrameData interfaces
 interface Keypoint {
   x: number;
   y: number;
@@ -29,7 +28,6 @@ interface FrameData {
 }
 
 const VideoCall = () => {
-  // States
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [recording, setRecording] = useState(false);
@@ -43,7 +41,6 @@ const VideoCall = () => {
     right_hand_keypoints: [],
   });
 
-  // Refs
   const socketRef = useRef<Socket>();
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -53,7 +50,6 @@ const VideoCall = () => {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Media Handlers
   const toggleMedia = (type: "audio" | "video") => {
     if (type === "audio") {
       setAudioEnabled((prev) => !prev);
@@ -99,14 +95,12 @@ const VideoCall = () => {
       const audioTracks = streamRef.current.getAudioTracks();
       const videoTracks = streamRef.current.getVideoTracks();
 
-      // Enable/disable audio tracks
       audioTracks.forEach((track) => (track.enabled = audioEnabled));
 
-      // Enable/disable video tracks
       videoTracks.forEach((track) => {
         track.enabled = videoEnabled;
         if (!videoEnabled) {
-          track.stop(); // Stop the track if video is disabled
+          track.stop();
         }
       });
     }
@@ -122,7 +116,7 @@ const VideoCall = () => {
     const holistic = holisticRef.current;
     if (holistic) {
       holistic.onResults((results: Results) => {
-        console.log("Results received:", results); // Debug log
+        console.log("Results received:", results);
 
         const poseKeypoints =
           results.poseLandmarks?.map((point) => ({
@@ -166,16 +160,14 @@ const VideoCall = () => {
 
   const stopRecording = () => {
     if (holisticRef.current) {
-      holisticRef.current.onResults(() => {}); // Stop receiving results
+      holisticRef.current.onResults(() => {});
     }
 
-    // Save data to a JSON file
     downloadJSONFile(recordedData);
 
     setRecording(false);
   };
 
-  // Function to download JSON file
   const downloadJSONFile = (data: FrameData) => {
     const blob = new Blob([JSON.stringify(data, null, 2)], {
       type: "application/json",
@@ -185,10 +177,9 @@ const VideoCall = () => {
     a.href = url;
     a.download = "recorded_data.json";
     a.click();
-    URL.revokeObjectURL(url); // Clean up the URL object
+    URL.revokeObjectURL(url);
   };
 
-  // Translation Handlers
   const handleTranslate = () => {
     setTranslateEnabled(true);
     setTranslationResult("번역 결과가 여기에 표시됩니다.");
@@ -198,7 +189,6 @@ const VideoCall = () => {
     console.log("Sending translation:", translationResult);
   };
 
-  // Socket and PeerConnection setup
   useEffect(() => {
     socketRef.current = io("localhost:8080");
 
@@ -257,7 +247,6 @@ const VideoCall = () => {
     }
   };
 
-  // Update media tracks when audio/video states change
   useEffect(() => {
     if (streamRef.current) {
       updateMediaTracks();
@@ -266,7 +255,6 @@ const VideoCall = () => {
     }
   }, [audioEnabled, videoEnabled]);
 
-  // Holistic initialization
   useEffect(() => {
     if (webcamRef.current && !holisticRef.current) {
       const holistic = new Holistic({
@@ -282,14 +270,12 @@ const VideoCall = () => {
 
       holisticRef.current = holistic;
 
-      holisticRef.current.onResults((results: Results) => {
-        // Optional: Process results if needed
-      });
+      holisticRef.current.onResults((results: Results) => {});
     }
 
     return () => {
       if (holisticRef.current) {
-        holisticRef.current = null; // Cleanup on unmount
+        holisticRef.current = null;
       }
     };
   }, [webcamRef.current]);
@@ -321,7 +307,7 @@ const VideoCall = () => {
       <div className={styles.controls}>
         <div className={styles.iconControls}>
           <div onClick={() => toggleMedia("audio")} className={styles.icon}>
-            <FontAwesomeIcon 
+            <FontAwesomeIcon
               icon={audioEnabled ? faMicrophone : faMicrophoneSlash}
               size="2x"
               color={audioEnabled ? "#4CAF50" : "#f44336"}

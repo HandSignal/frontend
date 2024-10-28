@@ -1,16 +1,14 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
 import styles from "../styles/Mypage.module.css";
 import Nav from "./Nav";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // 아이콘 추가
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-// 사용자 데이터 타입 정의
 interface UserData {
   username: string;
   password: string;
   nickname: string;
 }
 
-// 컴포넌트
 const Mypage: React.FC = () => {
   const initialUserData: UserData = {
     username: "Hyeonseo",
@@ -38,7 +36,6 @@ const Mypage: React.FC = () => {
 
   const handleDelete = (): void => {
     if (window.confirm("정말로 회원탈퇴하시겠습니까?")) {
-      // 실제 회원탈퇴 로직
       alert("회원탈퇴가 완료되었습니다.");
     }
   };
