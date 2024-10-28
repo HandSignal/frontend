@@ -7,7 +7,7 @@ import Modal from "./LogoutModal";
 const Nav: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // 현재 경로를 가져오기 위한 useLocation 훅
+  const location = useLocation();
 
   const handleLogout = () => {
     setIsModalOpen(true);
@@ -26,7 +26,6 @@ const Nav: React.FC = () => {
     navigate("/home");
   };
 
-  // 현재 경로에 따라 동적으로 스타일을 적용할 수 있도록 helper 함수를 만듭니다.
   const getButtonClass = (path: string) => {
     return location.pathname === path
       ? `${styles.navButton} ${styles.active}`
